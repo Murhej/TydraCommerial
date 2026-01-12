@@ -1,8 +1,8 @@
 // ServicesGrid.jsx
 import React, { useEffect, useMemo, useState } from 'react';
-import addOn from "../../../public/addOn.png"
-import Basic from "../../../public/Basic.png"
-import Premium from "../../../public/Premium.png"
+import addOn from "../Img/addOn.png"
+import Basic from "../Img/Basic.png"
+import Premium from "../Img/Premium.png"
 import './ServicesGrid.css';
 
 export default function ServicesGrid() {

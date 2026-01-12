@@ -1,7 +1,7 @@
 // src/components/Header/Header.jsx
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import frontlogo from '../../../public/frontlogo.png';
+import frontlogo from '../Img/frontlogo.png';
 import './header.css';
 
 export default function Header() {

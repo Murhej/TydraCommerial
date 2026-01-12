@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import SQFTSheet from "../../../public/SQFTSheet.png";
+import SQFTSheet from "../Img/SQFTSheet.png";
 import "./Measuring.css";
 
 export default function Measuring() {

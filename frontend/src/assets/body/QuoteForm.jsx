@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { API_URL } from "../..//config"; // adjust path if needed
+import { API_URL } from "../../config"; // adjust path if needed
 
 import "./QuoteForm.css";
 

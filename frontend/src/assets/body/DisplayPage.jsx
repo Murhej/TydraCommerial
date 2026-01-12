@@ -1,5 +1,5 @@
 import React, {useRef} from 'react';
-import CleaningIllustration from "../Img/DisplayPage.png";
+import CleaningIllustration from "../Img/DisplayFront.png";
 import "./displayPage.css";
 
 export default function DisplayPage({onNext}) {

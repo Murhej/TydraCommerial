@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from "../../config";
-import frontlogo from "../../../public/frontlogo.png";
-import logoDisplay from "../../../public/logoDisplay.png";
-import hamburger from "../../../public/hamburger.gif";
+import { API_URL } from "../../config"; // adjust path if needed
+
+import frontlogo from "../Img/frontlogo.png";
+import logoDisplay from "../Img/logoDisplay.png";
+import hamburger from "../Img/hamburger.gif";
 import "./dashboard.css";
 
 /* ---------------- Dashboard Navigation ---------------- */

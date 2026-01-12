@@ -3,30 +3,30 @@ import "./DisplayMessage.css";
 
 const features = [
   {
-    icon: "/dollarSign.png",
+    icon: "src/assets/Img/dollarSign.png",
     title: "Affordable Packages",
     description:
       "Transparent per-sq-ft or hourly pricing with no hidden fees. Monthly plans available.",
   },
   {
-    icon: "/location.png",
+    icon: "src/assets/Img/location.png",
     title: "GTA Coverage",
     description:
       "Serving Toronto, Scarborough, North York, Etobicoke, Mississauga, Brampton, Vaughan, and Markham.",
   },
   {
-    icon: "/staff.png",
+    icon: "src/assets/Img/staff.png",
     title: "Discreet, professional staff",
     description:
       "Background-checked, uniformed cleaners trained to work quietly without disrupting your space.",
   },
   {
-    icon: "/guarantee.png",
+    icon: "src/assets/Img/guarantee.png",
     title: "100% satisfaction guarantee",
     description: "If anything isn’t right, we’ll return within 24 hours to make it right.",
   },
   {
-    icon: "/leafIcon.png",
+    icon: "src/assets/Img/leafIcon.png",
     title: "Eco & allergy-safe options",
     description:
       "Choose scent-free, eco-certified, or hypoallergenic products tailored to your preferences.",
