@@ -1,0 +1,99 @@
+/* WhyUs.css (responsive) */
+
+.why-us {
+  padding: 2rem;
+  padding-left: 5rem;
+
+  font-family: 'Segoe UI', sans-serif;
+  color: #05426d;
+  background-color: white;
+  width: 98vw;
+  max-width: 100vw;
+  box-sizing: border-box;
+  
+
+}
+
+/* Title */
+.why-us__title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #05426d;
+  text-align: center;
+}
+
+/* Fluid grid: will auto-fill as many cards as fit */
+.why-us__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+
+}
+
+/* Card styling */
+.why-us__card {
+  display: flex;
+  align-items: center;
+  background: #f0fcff;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.why-us__card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Icon wrapper */
+.why-us__icon-wrap {
+  font-size: 2rem;
+  margin-right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #009eaa;
+}
+.why-us__icon {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+/* Text */
+.why-us__text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* -----------------------------
+   Breakpoints
+   ----------------------------- */
+
+/* ≤700px: force two columns */
+@media (max-width: 700px) {
+  .why-us__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ≤500px: collapse to one column */
+@media (max-width: 500px) {
+  .why-us__grid {
+    grid-template-columns: 1fr;
+  }
+  .why-us__title {
+    font-size: 1.75rem;
+  }
+  .why-us__icon-wrap {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+  }
+  .why-us__text {
+    font-size: 0.85rem;
+  }
+  .why-us {
+    width: 95vw;
+    padding: 1.5rem 1rem;
+  }
+}

@@ -1,0 +1,386 @@
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+
+  padding: 8px 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+
+  color: #6b7280;
+}
+
+.calendar-header button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: #f3f4f6;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: background 0.2s ease;
+}
+
+.calendar-header button:hover {
+  background: #e5e7eb;
+}
+.calendar-grid {
+  flex: 1; /* 🔥 THIS fixes the empty bottom */
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 14px;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 18px 24px;
+  margin-bottom: 12px;
+
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.calendar-header h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: #111827;
+}
+
+
+/* CELL */
+.calendar-cell {
+  background: white;
+  border-radius: 16px;
+  padding: 14px;
+
+  min-height: 160px;   /* 🔥 taller cells */
+  display: flex;
+  flex-direction: column;
+
+  border: 1px solid #e5e7eb;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.calendar-cell:hover {
+  box-shadow: 0 8px 26px rgba(0,0,0,0.10);
+  transform: translateY(-2px);
+}
+
+/* DATE */
+.calendar-date {
+  font-size: 15px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: #111827;
+}
+
+
+.calendar-date.clickable {
+  cursor: pointer;
+}
+
+/* PAST */
+.calendar-cell.past {
+  background: #f3f4f6;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* TODAY (NO APPOINTMENT) */
+.calendar-cell.today {
+  background: #eff6ff;
+  border: 2px solid #2563eb;
+}
+
+/* TODAY WITH APPOINTMENT */
+.calendar-cell.today-appointment {
+  background: #fee2e2;
+  border: 2px solid #dc2626;
+}
+
+/* URGENT 1–2 DAYS */
+.calendar-cell.urgent {
+  background: #fff4cc;
+  border: 2px solid #f59e0b;
+}
+
+/* SOON 3–7 DAYS */
+.calendar-cell.soon {
+  background: #ecfdf5;
+  border: 2px solid #10b981;
+}
+
+/* FAR */
+.calendar-cell.has-appointment {
+  background: #fffbea;
+  border: 2px solid #fde68a;
+}
+
+/* APPOINTMENT CARD */
+.calendar-entry {
+  background: #fde68a;
+  border-radius: 8px;
+  padding: 6px;
+  font-size: 12px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+    margin-top: 6px;
+}
+
+.calendar-cell.today-appointment .calendar-entry {
+  background: #fecaca;
+  color: #7f1d1d;
+}
+
+.calendar-cell.urgent .calendar-entry {
+  background: #fbbf24;
+  color: #78350f;
+}
+
+.calendar-cell.soon .calendar-entry {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+/* DELETE */
+.delete-btn {
+  background: none;
+  border: none;
+  color: #b91c1c;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* FORM */
+.calendar-expand {
+  margin-top: 8px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 8px;
+}
+
+.calendar-expand input,
+.calendar-expand select {
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.time-row {
+  display: flex;
+  gap: 6px;
+}
+.calendar-box {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 140px); /* adjust if header/navbar exists */
+}
+
+.calendar-btn {
+  width: 100%;
+  padding: 8px;
+  background: #0f766e;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+/* 🔴 RED = 0–7 DAYS */
+.calendar-cell.danger {
+  background: #fee2e2;
+  border: 2px solid #dc2626;
+}
+
+.calendar-cell.danger .calendar-entry {
+  background: #fecaca;
+  color: #7f1d1d;
+}
+
+/* MODAL */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: white;
+  padding: 24px;
+  width: 420px;
+  border-radius: 16px;
+}
+
+.modal-card input,
+.modal-card textarea,
+.modal-card select {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.modal-card textarea {
+  min-height: 80px;
+}
+
+.primary-btn {
+  width: 100%;
+  background: #0f766e;
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.danger-btn {
+  width: 100%;
+  background: #dc2626;
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+}
+/* 🔴 TODAY APPOINTMENT */
+.calendar-cell.today-appointment {
+  background: #fee2e2;
+  border: 2px solid #dc2626;
+}
+
+.calendar-cell.today-appointment .calendar-entry {
+  background: #fecaca;
+  color: #7f1d1d;
+}
+
+/* 🟡 1–7 DAYS */
+.calendar-cell.soon-appointment {
+  background: #fff7ed;
+  border: 2px solid #f59e0b;
+}
+
+.calendar-cell.soon-appointment .calendar-entry {
+  background: #fde68a;
+  color: #92400e;
+}
+
+/* 🟢 8+ DAYS */
+.calendar-cell.future-appointment {
+  background: #ecfdf5;
+  border: 2px solid #10b981;
+}
+
+.calendar-cell.future-appointment .calendar-entry {
+  background: #bbf7d0;
+  color: #065f46;
+}
+/* 🔴 TODAY APPOINTMENT */
+.calendar-cell.today-appointment {
+  background: #fee2e2;
+  border: 2px solid #dc2626;
+}
+
+.calendar-cell.today-appointment .calendar-entry {
+  background: #fecaca;
+  color: #7f1d1d;
+}
+
+/* 🟡 1–7 DAYS */
+.calendar-cell.soon-appointment {
+  background: #fff7ed;
+  border: 2px solid #f59e0b;
+}
+
+.calendar-cell.soon-appointment .calendar-entry {
+  background: #fde68a;
+  color: #92400e;
+}
+
+/* 🟢 8+ DAYS */
+.calendar-cell.future-appointment {
+  background: #ecfdf5;
+  border: 2px solid #10b981;
+}
+
+.calendar-cell.future-appointment .calendar-entry {
+  background: #bbf7d0;
+  color: #065f46;
+}
+.calendar-header-actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.today-btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 700;
+
+  border-radius: 999px;
+  border: 1px solid #2563eb;
+
+  background: #eff6ff;
+  color: #2563eb;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.today-btn:hover {
+  background: #2563eb;
+  color: white;
+}
+.repeat-tag {
+  margin-left: 6px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 999px;
+  background: #e5e7eb;
+  color: #374151;
+}
+.save-btn {
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 800;
+
+  border-radius: 999px;
+  border: none;
+
+  background: #16a34a;
+  color: white;
+
+  cursor: pointer;
+  margin-right: 12px;
+
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.save-btn:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}

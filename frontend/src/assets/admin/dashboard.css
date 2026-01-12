@@ -1,0 +1,684 @@
+.dashboard-page {
+  background: #f3f4f5;
+  height: 100vh;
+  width: 100vw;
+  font-family: "Inter", sans-serif;
+
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn.danger {
+  background: #dc2626;
+  color: white;
+}
+
+.btn.danger:hover {
+  background: #b91c1c;
+}
+
+/* Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  background: #e7e2e2;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  width: 100vw;
+}
+
+.logo img{
+  height: clamp(3rem, 1rem + 1vw, 25rem);
+  color: #1b3c59;
+
+}
+
+.dashboard-nav {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+}
+.profile-menu {
+  display: flex;
+  position: relative;
+}
+/* Site-style buttons */
+.site-btn {
+  background-color: #f9fafb00;
+  color: #053247;
+  font-size: clamp(0.2rem, 0.2rem + 1vw, 2rem);
+  font-weight: 700;
+  border: none;
+  padding: 1rem;
+  border-radius: 100px;
+
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.site-btn-10 {
+  border: none;
+  border-radius: 100px;
+  background-color: #f9fafb00;
+}
+.site-btn-10 img{
+  width:  clamp(1rem, 3rem + 1vw, 15rem);
+  border: none;
+  border-radius: 100px;
+
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.site-btn:hover {
+  background: #0284c7;
+}
+
+.logout {
+  background: #ef4444;
+}
+
+.logout:hover {
+  background: #dc2626;
+}
+
+/* Filters */
+.dashboard-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.8rem;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+  width: 80vw;
+}
+
+
+.filter-options select {
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  width: 100%;
+  height: 3rem;
+}
+.info-Box{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  padding: 1rem;
+}
+/* Task List */
+.dashboard-list {
+  background-color: #ffffff;
+  border-radius: 12px;
+  width: 95%;
+  height: 88%;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  
+}
+
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1b3c59;
+}
+:root {
+  --col-ref: 30%;
+  --col-business: 40%;
+  --col-client: 30%;
+}
+
+/* ---------- Scroll area ---------- */
+.dashboard-list {
+  /* keep your vertical scroll */
+  overflow: auto;                  /* allows BOTH x & y scrolling when needed */
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  background: #fff;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ---------- Table-like grid rows ---------- */
+.task-header,
+.task-row {
+  display: grid;
+  grid-template-columns: var(--col-ref) var(--col-business) var(--col-client);
+  align-items: center;
+  padding: 0.75rem 1rem;
+}
+
+/* On wider screens, let columns be fluid */
+@media (min-width: 900px) {
+  .task-header,
+  .task-row {
+  }
+}
+
+/* ---------- Header styling (sticky) ---------- */
+.task-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #e7e2e2;             /* your original */
+  border-bottom: 2px solid rgb(71, 82, 95);
+  font-weight: 700;
+  color: #053247;
+  /* subtle glass effect on scroll (optional) */
+  backdrop-filter: saturate(120%) blur(2px);
+}
+
+/* ---------- Rows ---------- */
+.task-row {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+/* Zebra stripe */
+.task-row:nth-child(odd) {
+  background: #fafafa;
+}
+
+/* Hover/active/focus styles */
+.task-row:hover {
+  background-color: #f3f4f6;
+}
+.task-row:focus-within {
+  outline: 2px solid #93c5fd;
+  outline-offset: -2px;
+  background: #eef6ff;
+}
+
+/* ---------- Cell text ---------- */
+.task-header span,
+.task-row span {
+  text-align: left;
+  overflow: hidden;               /* prevents cells from spilling vertically */
+  text-overflow: ellipsis;        /* nice truncation within the fixed columns */
+}
+
+/* Utility: add this class to a span if you want explicit truncation */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- Nicer horizontal scrollbar ---------- */
+.dashboard-list::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+
+}
+.dashboard-list::-webkit-scrollbar-thumb {
+  background: rgba(120,120,120,0.35);
+  border-radius: 999px;
+  
+}
+.dashboard-list::-webkit-scrollbar-track {
+  background: transparent;
+  
+}
+
+
+.burgerView {
+  position: absolute;
+  top: 2.7rem;         /* adjust down below the profile icon */
+  right: 0;          /* align with button */
+  width: 12rem;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 9999;     /* makes sure it flies on top */
+}
+
+.Probutton {
+  height: 3rem;
+  background: #f3f4f6;
+  border: none;
+  cursor: pointer;
+}
+
+.Probutton:hover {
+  background: #e5e7eb;
+}
+
+.logoutbutton {
+  height: 3rem;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.close-burger{
+  display: none;
+}
+
+.logoutbutton:hover {
+  background-color: #b91c1c;
+}
+/* Hide burger by default (desktop) */
+.burger-icon {
+  display: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+.burgermeanu{
+  display: none;
+  height: 2rem;
+  background-color: #0285c700;
+  cursor: pointer;
+}
+.smallerwindowReview{
+  display: flex;
+  flex-direction: row;
+  width: 80%;
+}
+/* Responsive header for small screens */
+@media (max-width: 500px) {
+  .dashboard-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  
+  }
+
+  .dashboard-nav {
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+
+  }
+  .site-btn{
+    font-size: clamp(1rem, 0.5rem, 2rem);
+    
+  }
+  
+  .profile-menu{
+    display: flex;
+    flex-direction: column;
+    margin-top: 2rem;
+    
+  }
+  .profile-menu img{
+    height: 3rem;
+    width: 4rem;    
+  }
+  
+
+
+  .burgermeanu{
+    display: block;
+    
+  }
+
+  
+  .smallerwindowReview {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    height: 100%;
+    background-color: #fff;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    z-index: 10000;
+    transition: transform 0.3s ease-in-out;
+  }
+  .burgerView {
+    position: absolute;
+    top: 3rem;         /* adjust down below the profile icon */
+    right: 0;          /* align with button */
+    width: 100%;
+
+    border-radius: none;
+    display: flex;
+    background-color: white;
+    overflow: hidden;
+    box-shadow: none;
+    z-index: 9999;     /* makes sure it flies on top */
+  }
+  .Probutton {
+  height: 3rem;
+  font-weight: 600; 
+  background: #f3f4f604;
+  border: none;
+  cursor: pointer;
+}
+.close-burger{
+  display:block;
+  height: 3rem;
+  margin-bottom: 1rem;
+  font-size: larger;
+  color: rgb(249, 250, 252);
+  background-color: #0284c7;
+  border-radius: 2px 2px 15px 15px;
+}
+.Probutton:hover {
+  background: #e5e7eb;
+}
+
+.logoutbutton {
+  height: 3rem;
+  background-color: #f7f3f309;
+  color: rgb(9, 26, 36);
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+}
+
+  .smallerwindowReview.open {
+    transform: translateX(0); /* slide in */
+  }
+
+  .Probutton, .logoutbutton {
+    width: 100%;
+    text-align: left;
+    padding: 1rem;
+    border-bottom: 1px solid #ddd;
+  }
+}
+
+/* Overlay */
+.modal-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  
+  display: grid;
+  place-items: center;
+  z-index: 10000;
+  padding: 24px;
+}
+
+/* Card */
+.modal{
+  width: min(920px, 96vw);
+  max-height: min(86vh, 900px);
+  background: #f9fafb;
+  border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+/* Header */
+.modal-header{
+  padding: 18px 18px 14px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.modal-header h3{
+  margin: 0;
+  font-size: 1.1rem;
+  letter-spacing: 0.2px;
+}
+
+.modal-sub{
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+}
+.dot{ opacity: 0.6; }
+
+/* close icon */
+.icon-btn{
+  border: 0;
+  background: rgba(0,0,0,0.06);
+  
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+.icon-btn:hover{ background: rgba(0,0,0,0.10); }
+
+/* Body */
+.modal-body{
+  padding: 18px;
+  overflow: auto;
+}
+
+/* Grid key/value */
+.kv-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+  
+}
+.btn-ghost{
+  color: #000305;
+}
+
+.kv{
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 12px 12px;
+  display: grid;
+  gap: 6px;
+  border: none;
+
+}
+
+.kv .k{
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: none;
+  
+}
+
+.kv .v{
+  font-size: 0.95rem;
+  color: #111827;
+  word-break: break-word;
+  border: none;
+
+}
+
+.kv.full{
+  grid-column: 1 / -1;
+  border: none;
+}
+
+.v.code{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  background: rgba(0,0,0,0.04);
+  padding: 6px 8px;
+  border-radius: 10px;
+  display: inline-block;
+  width: fit-content;
+  border: none;
+  
+}
+
+.v.message{
+  white-space: pre-wrap;
+  line-height: 1.35;
+  border: none;
+
+}
+
+/* Divider */
+.divider{
+  height: 1px;
+  background: rgba(0,0,0,0.08);
+  margin: 16px 0;
+  border: none;
+  
+}
+
+/* Chips */
+.chips-block h4{
+  margin: 14px 0 8px;
+  font-size: 0.9rem;
+  color: #111827;
+  border: none;
+
+  
+}
+
+.chips{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border: none;
+
+  
+}
+
+.chip{
+  font-size: 0.85rem;
+  background: rgba(59, 130, 246, 0.10);
+  border: 1px solid rgba(59, 130, 246, 0.20);
+  color: #1f2937;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: none;
+
+  
+}
+
+/* Footer */
+.modal-footer{
+  padding: 14px 18px;
+  background: #ffffff;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border: none;
+
+}
+
+.btn{
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.12);
+  cursor: pointer;
+  font-weight: 600;
+  border: none;
+
+}
+
+.btn.ghost{
+  background: transparent;
+  border: none;
+
+}
+
+.btn.primary{
+  background: #111827;
+  color: white;
+  border-color: #111827;
+  border: none;
+
+}
+
+.btn.primary:hover{ opacity: 0.95; }
+
+/* Responsive */
+@media (max-width: 720px){
+  .kv-grid{ grid-template-columns: 1fr; }
+  .modal-overlay{ padding: 14px; }
+}
+.button {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  color: red;
+  background: transparent;  
+  padding: 0 4px;           
+  font-size: 15px;   
+  font-weight: bold;  
+  border: none;
+
+}
+.LeftInput{
+  border: none;
+  width: 50%;
+}
+
+.Addbutton{
+  background-color: #d1d5db00;
+  border-radius: 0;
+  font-size: larger;
+  cursor: pointer;
+  color: #b91c1c;
+  border: none;
+  
+}
+.header-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+/* Dropdown profile summary */
+.profile-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 6px;
+}
+
+.profile-summary img {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.profile-summary strong {
+  display: block;
+  font-size: 14px;
+}
+
+.profile-summary span {
+  font-size: 12px;
+  color: #6b7280;
+}

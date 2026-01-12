@@ -1,0 +1,305 @@
+/* Keep your grid for inner lists */
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-left: 2rem;
+}
+
+/* OUTER: section wrapper */
+.grid-serivce-tier {
+  position: relative;           /* <— important */
+  background: #fff;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  padding: 16px 12px 10px;
+}
+
+/* FOOTER BAR */
+.grid-serivce-cost {
+  height: 4rem;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+/* STAGE: holds the 3 cards stacked */
+.grid-serivce-provider {
+  position: relative;           /* <— important */
+  height: 320px;  
+}
+
+/* CARD: base styles (now absolute + centered) */
+.gsp-tier {
+  position: absolute;           /* <— important */
+  left: 50%;
+  top: 12px;
+  transform: translateX(-50%);  /* center horizontally */
+  width:40%;
+
+  border: 2px solid rgb(244, 239, 239);
+  height: 20rem;
+  padding: 1.25rem 1rem;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+
+  transition: transform 450ms ease, opacity 450ms ease, filter 450ms ease;
+  text-align: center;
+}
+
+/* HOVER is optional now; leave it if you like */
+.gsp-tier:hover {
+  transform: translateX(-50%) translateY(-4px);
+  box-shadow: 0 14px 36px rgba(0,0,0,0.12);
+}
+
+/* TITLES & TEXT — fix the clamp so it doesn't explode */
+.gsp-tier h2 {
+  margin: 0 0 6px;
+  font-size: clamp(1rem, 0.8rem + 1vw, 1.35rem);
+  font-weight: 700;
+}
+.gsp-tier p  {
+  margin: 0 0 10px;
+  height: 30%;
+  color: #555;
+  font-size: clamp(0.85rem, 0.7rem + 0.4vw, 1rem); /* was up to 100rem (!) */
+}
+.gsp-tier button  {
+ box-shadow: 0px 8px 30px rgba(0,0,0,0.08);
+  background-color: rgb(253, 250, 250);
+  align-items: bottom;
+  color: #000;
+  margin: 0 0 10px;
+  width: 90%;
+  font-weight: bold;
+  font-size: clamp(0.85rem, 0.rem + 0.4vw, 3rem); /* was up to 100rem (!) */
+}
+.gsp-tier img  {
+  height: 7rem;
+  font-size: clamp(0.85rem, 0.7rem + 0.4vw, 1rem); /* was up to 100rem (!) */
+}
+/* POSITIONS — these create the “coverflow” effect */
+.gsp-tier.center {
+  transform: translateX(-50%) scale(1) rotateY(0deg);
+  opacity: 1;
+  filter: none;
+  z-index: 3;
+}
+.gsp-tier.left {
+  transform: translateX(calc(-50% - 260px)) scale(0.86) rotateY(8deg);
+  opacity: 0.55;
+  filter: blur(0.3px);
+  z-index: 2;
+}
+.gsp-tier.right {
+  transform: translateX(calc(-50% + 260px)) scale(0.86) rotateY(-8deg);
+  opacity: 0.55;
+  filter: blur(0.3px);
+  z-index: 2;
+}
+
+/* responsive tweak */
+@media (max-width: 640px) {
+  .gsp-tier { width: 88%; }
+  .gsp-tier.left  { transform: translateX(calc(-50% - 180px)) scale(0.84) rotateY(8deg); }
+  .gsp-tier.right { transform: translateX(calc(-50% + 180px)) scale(0.84) rotateY(-8deg); }
+}
+
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 80%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  
+}
+.service-grid{
+    padding-top: 1rem;
+
+  }
+/* Modal: small screens */
+@media (max-width: 620px) {
+  .modal-content {
+    width: 92%;
+    padding: 1.25rem;
+    border-radius: 12px;
+    max-height: 88vh;        /* keep it scrollable if long */
+    overflow-y: auto;
+  }
+  .modal-content-header {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .modal-desc {
+    font-size: 0.95rem;
+  }
+}
+
+/* Ultra-small screens */
+@media (max-width: 350px) {
+  .modal-content {
+    width: 95%;
+    padding: 1rem;
+    border-radius: 10px;
+  }
+}
+
+/* Service grid inside modal */
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* desktop/tablet: 2 cols */
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* Collapse to single column on narrow screens */
+@media (max-width: 700px) {
+  .service-grid {
+    grid-template-columns: 1fr;  /* one column */
+    gap: 10px;
+  }
+}
+
+/* Service card */
+.service-box {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  background: #fafafa;
+  padding: 10px 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+/* Title */
+.service-box .info h4 {
+  margin: 0 0 6px;
+  font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.05rem);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+/* Bullets */
+.service-box .info ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.service-box .info li {
+  position: relative;
+  padding-left: 16px;
+  margin: 4px 0;
+  font-size: clamp(0.86rem, 0.82rem + 0.2vw, 0.95rem);
+  color: #444;
+  line-height: 1.35;
+}
+.service-box .info li::before {
+  content: "•";
+  position: absolute;
+  left: 4px;
+  top: 0;
+  line-height: 1;
+  font-weight: 700;
+  opacity: 0.6;
+}
+
+/* Extra-tight phones */
+@media (max-width: 350px) {
+  .service-box {
+    padding: 8px 10px;
+  }
+  .service-box .info h4 {
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+  }
+  .service-box .info li {
+    font-size: 0.85rem;
+    margin: 2px 0;
+  }
+}
+
+.modal-content img{
+
+  width: clamp(2rem, 5rem + 1vw, 30rem);
+}
+/* Header row: image left, text right */
+.modal-content-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+/* Logo sizing: fixed, neat, responsive enough */
+.modal-content-header img {
+  width: clamp(3rem, 5rem + 1vw, 50rem);     
+  object-fit: cover;
+  border-radius: 8px;   /* optional, looks nice */
+  flex-shrink: 0;       /* don't let it squish */
+}
+
+/* Text column takes remaining space */
+.modal-content-header-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;         /* enables text ellipsis/wrapping correctly */
+  flex: 1;              /* take leftover space */
+}
+
+/* Title + description in header */
+#modal-title {
+  margin: 0 0 4px;
+  font-size: clamp(1rem, 0.9rem + 0.6vw, 1.4rem);
+  font-weight: 700;
+}
+.modal-desc {
+  margin: 0;
+  color: #555;
+  font-size: clamp(0.9rem, 0.85rem + 0.3vw, 1rem);
+}
+
+/* Optional: stack on narrow screens */
+@media (max-width: 520px) {
+  .modal-content-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .modal-content-header img {
+    width: 72px;
+    height: 72px;
+  }
+}
+
+
+.expand-btn {
+  margin-top: 12px;
+  padding: 6px 12px;
+  background: #628159;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.expand-btn:hover {
+  background: #0f6c4d;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}

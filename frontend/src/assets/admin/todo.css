@@ -1,0 +1,260 @@
+/* =========================
+   TODO / TASKS STYLING (CLEAN FIX)
+   ========================= */
+
+:root {
+  --card: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --soft: #f8fafc;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --radius: 16px;
+}
+
+/* ===== PAGE LAYOUT ===== */
+.todo-shell {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.todo-page {
+  width: 100%;
+  max-width: none;            /* full width */
+  margin: 0;
+  padding: 18px 26px 60px;    /* nice gutters */
+  display: flex;
+  flex-direction: column;
+  gap: 18px;                  /* space between cards */
+  overflow-x: hidden;         /* kill horizontal scroll */
+}
+
+/* Keep header pinned (optional) */
+.todo-shell :where(header, .header, .navbar) {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* ===== CARD SECTIONS ===== */
+.todo-page .dashboard-list {
+  width: 100%;
+  margin: 0; /* gap handles spacing */
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 18px 18px 16px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+
+  height: auto !important;
+  min-height: unset !important;
+  flex: initial !important;
+
+  overflow-x: hidden !important; /* ✅ stop sideways scroll inside card */
+}
+
+/* Section titles */
+.todo-page .section-title {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: 0.2px;
+}
+
+/* ===== GRID TABLE ===== */
+.todo-page .task-header,
+.todo-page .task-row {
+  display: grid;
+  align-items: center;
+
+  /* ✅ FLEXIBLE COLUMNS (NO OVERFLOW) */
+  grid-template-columns:
+    minmax(0, 1.4fr)  /* Referral */
+    minmax(0, 2fr)    /* Business */
+    minmax(0, 2fr)    /* Client */
+    minmax(0, 1fr)    /* Status */
+    minmax(0, 0.9fr); /* Due */
+
+  column-gap: 16px;
+}
+
+/* Header row */
+.todo-page .task-header {
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(to bottom, #ffffff, #fbfdff);
+  border-radius: 12px;
+}
+
+/* Regular row */
+.todo-page .task-row {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: var(--soft);
+  border: 1px solid #eef2f7;
+  border-radius: 12px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.todo-page .task-row:hover {
+  cursor: pointer;
+  background: #eef3ff;
+  border-color: #dbeafe;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
+}
+
+/* Cells */
+.todo-page .task-row > span,
+.todo-page .task-header > span {
+  min-width: 0; /* allow shrink */
+}
+
+.todo-page .task-row > span {
+  font-size: 14px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Referral bold */
+.todo-page .task-row > span:nth-child(1) {
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Right align Status + Due */
+.todo-page .task-row > span:nth-child(4),
+.todo-page .task-row > span:nth-child(5),
+.todo-page .task-header > span:nth-child(4),
+.todo-page .task-header > span:nth-child(5) {
+  justify-self: end;
+}
+
+/* ===== COMPACT LIST (3 COLS) ===== */
+.todo-page .dashboard-list.compact .task-header,
+.todo-page .dashboard-list.compact .task-row {
+  grid-template-columns:
+    minmax(0, 1.6fr) /* Referral */
+    minmax(0, 2fr)   /* Business */
+    minmax(0, 2fr);  /* Client */
+}
+
+/* ===== INVOICE ROW STATES ===== */
+.todo-page .invoice-row {
+  transition: background 0.2s ease;
+}
+
+.todo-page .invoice-row.success {
+  background: #e7f6ec;
+  border-left: 6px solid #1b7a3e;
+  border-color: #bfe6ce;
+}
+
+.todo-page .invoice-row.warning {
+  background: #fff4e5;
+  border-left: 6px solid #b45309;
+  border-color: #f3d7b5;
+}
+
+.todo-page .invoice-row.danger {
+  background: #fdecea;
+  border-left: 6px solid #b91c1c;
+  border-color: #f3c7c7;
+}
+
+/* Status pill (desktop) */
+.todo-page .status-text {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.todo-page .invoice-row.success .status-text {
+  background: #1b7a3e;
+  color: #ffffff;
+}
+
+.todo-page .invoice-row.warning .status-text {
+  background: #b45309;
+  color: #ffffff;
+}
+
+.todo-page .invoice-row.danger .status-text {
+  background: #b91c1c;
+  color: #ffffff;
+}
+
+/* Empty/loading text */
+.todo-page .ui-state {
+  padding: 14px;
+  color: var(--muted);
+  text-align: center;
+  font-size: 14px;
+}
+
+/* =========================
+   MOBILE FRIENDLY
+   ========================= */
+@media (max-width: 768px) {
+  .todo-page {
+    padding: 14px 14px 50px;
+  }
+
+  .todo-page .dashboard-list {
+    padding: 16px;
+  }
+
+  .todo-page .task-header {
+    display: none;
+  }
+
+  .todo-page .task-row {
+    grid-template-columns: 1fr;
+    row-gap: 10px;
+    padding: 14px;
+  }
+
+  .todo-page .task-row > span {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    display: block;
+  }
+
+  .todo-page .task-row > span::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 2px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .todo-page .status-text {
+    background: transparent !important;
+    color: var(--text) !important;
+    padding: 0;
+    border-radius: 0;
+    justify-self: start;
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    text-transform: none;
+  }
+}

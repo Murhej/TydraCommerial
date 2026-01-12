@@ -1,0 +1,76 @@
+[
+  
+  {
+    "submittedAt": "2025-12-22T03:45:29.986Z",
+    "id": "001",
+    "company": "TechCorp",
+    "name": "Alice Johnson",
+    "email": "murhej.shiha@gmail.com",
+    "message": "heloo, thisd message",
+
+    "sgft": "2000",
+    "Freq": "Weekly",
+    "industry": "Corporate Offices & Co-Working Spaces",
+    "footTraffic": "Light - small offices or limited staff",
+    "operatingHours": "After-hours",
+    "sharedSpaces": ["Common lobbies or reception areas", "Elevators & stairwells"],
+    "freqCount": "3",
+    "freqTimePerDay": "4",
+    "pricingModel": "Per square foot pricing",
+    "qualityExpectations": "Tidy/maintained - warehouses, offices",
+    "addOns": ["No add-on"],
+    "specialRequests": ["Green cleaning products"],
+    "currentCond": "Well maintained",
+    "currentProb": "Grease",
+    "referralCode": "HYDRA-CCW-2000-251221-1NAZ"
+  },
+
+
+
+  {
+    "id": "002",
+    "company": "GreenCo",
+    "name": "Bob Smith",
+"email": "murhej.shiha@gmail.com",
+    "message": "heloo, thisd message",
+
+    "sgft": "2000",
+    "Freq": "Weekly",
+    "industry": "Corporate Offices & Co-Working Spaces",
+    "footTraffic": "Light - small offices or limited staff",
+    "operatingHours": "After-hours",
+    "sharedSpaces": ["Common lobbies or reception areas", "Elevators & stairwells"],
+    "freqCount": "3",
+    "freqTimePerDay": "4",
+    "pricingModel": "Per square foot pricing",
+    "qualityExpectations": "Tidy/maintained - warehouses, offices",
+    "addOns": ["No add-on"],
+    "specialRequests": ["Green cleaning products"],
+    "currentCond": "Well maintained",
+    "currentProb": "Grease",
+    "referralCode": "HYDRA-CCW-2000-251221-1NAZ"
+  },
+  {
+    "id": "003",
+    "company": "BluePeak",
+    "name": "Maria Lopez",
+    "email": "murhej.shiha@gmail.com",
+    "message": "heloo, thisd message",
+
+    "sgft": "2000",
+    "Freq": "Weekly",
+    "industry": "Corporate Offices & Co-Working Spaces",
+    "footTraffic": "Light - small offices or limited staff",
+    "operatingHours": "After-hours",
+    "sharedSpaces": ["Common lobbies or reception areas", "Elevators & stairwells"],
+    "freqCount": "3",
+    "freqTimePerDay": "4",
+    "pricingModel": "Per square foot pricing",
+    "qualityExpectations": "Tidy/maintained - warehouses, offices",
+    "addOns": ["No add-on"],
+    "specialRequests": ["Green cleaning products"],
+    "currentCond": "Well maintained",
+    "currentProb": "Grease",
+    "referralCode": "HYDRA-CCW-2000-251221-1NAZ"
+  }
+]

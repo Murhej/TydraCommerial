@@ -1,0 +1,83 @@
+/* landingpage.css */
+
+/* Outer page wrapper: full viewport height + width */
+
+.landingBody {
+  width: 100%;               /* use full container width */
+  min-height: 100vh;         /* full viewport height */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow-x: hidden;        /* hide any accidental overflow */
+}
+
+/* Reserve space equal to header height so content starts below it */
+.landingBody .body {
+  flex: 1;
+  width: 100%;               /* inherit container width */
+  margin: 0 auto;
+  padding: 5rem 1rem 1rem;   /* top padding = header height */
+  box-sizing: border-box;
+}
+
+.footer {
+  background-color: #eceeec;
+  padding: 2rem 1.7rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+  
+  .footer__container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 2200px;
+  }
+  
+  .footer__column {
+    flex: 1 1 200px;   /* flexible, but never smaller than 200px */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .footer__header {
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+    color: #072442;
+  }
+  
+  .footer__column p {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+    color: #333;
+  }
+  
+  /* Social & payment icon rows */
+  .footer__social-icons,
+  .footer__payment-icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+  
+  .footer__social-icons img {
+    width: 1.6rem;
+    height: auto;
+  }
+  
+  .footer__payment-icons img {
+    width: 2.1rem;
+    height: auto;
+  }
+  
+  /* Make sure links have a focus state for a11y */
+  .footer__social-icons a:focus,
+  .footer__social-icons a:hover {
+    outline: 2px solid #61bbac;
+    outline-offset: 2px;
+  }
+  

@@ -1,0 +1,287 @@
+/* ContactInfo.css — responsive 250px to 4000px, updated green theme */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+/* ---------- Theme ---------- */
+:root{
+  --primary:#16a34a;        /* CTA green */
+  --primary-700:#12833d;    /* darker hover green */
+  --ink:#1f2937;            /* main text */
+  --muted:#6b7280;          /* secondary text */
+  --bg:#f3f5f7;             /* page background */
+  --card:#ffffff;           /* white card */
+  --border:#e5e7eb;         /* light border */
+  --shadow:rgba(0,0,0,.08);
+
+  --fs-xs:   clamp(.72rem, .65vw, .9rem);
+  --fs-sm:   clamp(.86rem, .85vw, 1.05rem);
+  --fs-base: clamp(1rem,  1.1vw, 1.25rem);
+  --fs-lg:   clamp(1.2rem, 1.6vw, 1.6rem);
+  --fs-xl:   clamp(1.6rem, 2.3vw, 2.6rem);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Poppins',sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+.contact-section {
+  display: flex;
+  flex-direction: column;
+
+}
+/* ---------- Page shell ---------- */
+.services__container{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+/* Hero / Contact top box */
+.services__hero {
+  background: #fff;                          /* white background */
+  color: var(--ink);
+  padding: clamp(1rem, 3.5vw, 3rem);
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.1);     /* soft shadow */
+  margin-bottom: clamp(.8rem, 1.2vw, 1.5rem);
+  margin-top: clamp(.8rem, 1.5vw, 2.5rem);
+  text-align: center;
+}
+
+.services__title {
+  font-weight: 800;
+  font-size: var(--fs-xl);
+  color: var(--ink);                         /* dark text */
+  margin-bottom: .35rem;
+}
+
+.services__subtitle {
+  font-size: var(--fs-base);
+  color: var(--muted);
+  opacity: .95;
+}
+
+/* Quick action chips (referral, call, email, directions) */
+.services__highlights .chip {
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 6px rgba(0,0,0,.1);
+  color: var(--ink);
+  width: 100%;
+  font-size: var(--fs-base);
+}
+.services__highlights .chip:hover {
+  background: #f9fafb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+}
+
+/* Steps (Contact / Quote / Schedule) */
+.steps {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: .6rem;
+  margin: 1rem auto;
+  padding: 0;
+}
+.step {
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 6px rgba(0,0,0,.1);
+  color: var(--ink);
+  padding: .5rem 1rem;
+  border-radius: 10px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  transition: all .2s ease;
+}
+.step--active {
+  background: var(--primary);                /* only active step stays green */
+  color: #fff;
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+}
+
+/* Contact info bar (Toronto, ON section) */
+.contact-header {
+  background: #fff;
+  color: var(--ink);
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.1);
+  text-align: center;
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+.contact-meta a {
+  color: var(--primary);   /* keep email/phone clickable in green */
+  font-weight: 700;
+}
+
+/* Form card */
+.contact-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.08);
+  margin: clamp(.8rem, 1.5vw, 2rem) auto 0;
+  max-width: clamp(320px, 92vw, 2600px);
+}
+
+/* Send button centered */
+.actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1.2rem;
+}
+.btn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: .9rem 1.2rem;
+  font-size: var(--fs-base);
+  font-weight: 700;
+  cursor: pointer;
+  min-width: 180px;
+  text-align: center;
+  transition: background .2s ease, transform .12s ease;
+}
+.btn:hover {
+  background: var(--primary-700);
+  transform: translateY(-2px);
+}
+
+/* ---------- Card ---------- */
+.contact-card{
+  background:var(--card);
+  border:1px solid #eef0f3;
+  border-radius:16px;
+  box-shadow:0 12px 36px var(--shadow);
+  overflow:hidden;
+  margin: clamp(.8rem, 1.5vw, 2rem) auto 0;
+  max-width: clamp(620px, 92vw, 1400px);
+}
+
+/* Card header */
+.contact-header{
+  background-color:white ;
+  color:#101010; text-align:center;
+  padding: clamp(1rem, 3vw, 2.25rem);
+  font-size: clamp(0.3rem, .3rem + 1vw, 4rem);
+
+}
+.contact-header h2{ font-size: clamp(.6rem, .6rem + 1vw, 5rem); font-weight:700; }
+.contact-meta{ margin:.35rem 0 .2rem; }
+.contact-meta a{ color:#282e31; text-decoration:none; font-weight:700; word-break:break-word; }
+.hours{
+  display:flex; justify-content:center; flex-wrap:wrap; gap:.5rem .8rem;
+  font-size: var(--fs-xs); opacity:.95; margin-top:.4rem;
+}
+
+/* ---------- Form ---------- */
+.contact-form{
+  display:grid;
+  gap: clamp(.8rem, 1.2vw, 1.2rem);
+  padding: clamp(1rem, 2.5vw, 2.25rem);
+
+  grid-template-columns: repeat(auto-fit, minmax(clamp(220px, 40vw, 520px), 1fr));
+}
+.field{ display:flex; flex-direction:column; min-width:0; }
+.field.full{ grid-column: 1 / -1; }
+.field label{ margin-bottom:.45rem; color:var(--ink); font-weight:600; font-size: var(--fs-sm); }
+.req::after{ content:" *"; color:#ef4444; }
+
+.field input,
+.field textarea{
+  width:100%;
+
+  padding:.8rem 1rem;
+  border:1px solid #dde3ea;
+  border-radius:10px;
+  font-size: var(--fs-base);
+  outline:none; background:#fff;
+  transition:border-color .18s ease, box-shadow .18s ease, transform .12s ease;
+}
+.field input::placeholder,.field textarea::placeholder{ color:#9aa8b4; }
+.field input:focus,.field textarea:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px rgba(22,163,74,.16);
+  transform:translateY(-1px);
+}
+
+/* Helper row */
+.field__meta{
+  display:flex; flex-wrap:wrap; gap:.4rem;
+  align-items:center; justify-content:space-between; margin-top:.4rem;
+}
+.field__error{ color:#b91c1c; font-size:.85rem; }
+.field__hint{ color:var(--muted); font-size:.85rem; }
+.count{ color:var(--muted); font-size:.8rem; }
+
+/* ---------- Actions ---------- */
+.actions{
+  align-items:center;
+  justify-content:center; 
+  width: 85vw;
+}
+.btn{
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  padding:.9rem 1.1rem;
+  font-size: var(--fs-base);
+  font-weight:800;
+  cursor:pointer;
+  min-width: clamp(150px, 150px + 1vw, 400px);
+  transition:background .2s, filter .2s, transform .12s ease;
+  display:inline-flex; justify-content:center; align-items:center;
+}
+.btn[disabled]{ filter:grayscale(.2) brightness(.95); cursor:not-allowed; }
+.btn--ghost{ display:none !important; }  /* Call Instead removed */
+
+/* ---------- Spinner ---------- */
+.spinner{
+  border:3px solid #f3f3f3; border-top:3px solid rgba(255,255,255,.95);
+  border-radius:50%; width:16px; height:16px; margin-right:.6rem;
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{ to{ transform:rotate(360deg);} }
+
+/* ---------- Toast ---------- */
+.toast{
+  position:fixed; inset:auto 1rem 1rem auto;
+  background:#fff; border-left:4px solid transparent;
+  border-radius:12px; padding:.85rem 1.2rem;
+  box-shadow:0 10px 28px rgba(0,0,0,.14);
+  font-size:var(--fs-sm);
+  opacity:0; transform:translateY(18px);
+  transition:all .28s ease; z-index:50;
+}
+.toast.ok,.toast.err{ opacity:1; transform:translateY(0); }
+.toast.ok{ border-left-color:#16a34a; }
+.toast.err{ border-left-color:#dc2626; }
+
+/* ---------- Utilities ---------- */
+.visually-hidden{ position:absolute !important; height:1px; width:1px; overflow:hidden; clip:rect(1px,1px,1px,1px); white-space:nowrap; }
+[id]{ scroll-margin-top: 6rem; }
+
+/* ---------- Ultra-wide ---------- */
+@media (min-width: 1920px){
+  .services__container{ width: min(88vw, 1680px); }
+  .contact-card{ max-width: min(70vw, 1500px); }
+}
+@media (min-width: 2560px){
+  .services__container{ width: min(80vw, 1800px); }
+  .contact-card{ max-width: min(64vw, 1600px); }
+}
+@media (min-width: 3400px){
+  .services__container{ width: min(72vw, 1900px); }
+  .contact-card{ max-width: min(58vw, 1700px); }
+}

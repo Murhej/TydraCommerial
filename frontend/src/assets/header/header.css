@@ -1,0 +1,160 @@
+:root {
+  --header-h: 6rem; /* keep a single source of truth */
+}
+
+/* Make page scrolling smooth (optional) */
+html { scroll-behavior: smooth; }
+
+/* ----------------------------------------
+   Fixed header always on top
+   ---------------------------------------- */
+.header-Body {
+  position: fixed;          /* <— fixed instead of sticky */
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-h);
+  background-color: rgb(241, 238, 238);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  z-index: 1000;
+  box-sizing: border-box;
+  transition: box-shadow 0.25s ease, backdrop-filter 0.25s ease;
+}
+
+/* Shadow appears only after you scroll a bit */
+.header-Body.scrolled {
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  /* optional subtle glass effect if you like */
+  /* backdrop-filter: saturate(120%) blur(6px); */
+}
+
+/* Spacer to offset content so it doesn't slide under header */
+.header-spacer {
+  height: var(--header-h);
+}
+
+/* Logo */
+.logo img {
+  height: clamp(4rem, 3.5rem + 1vw, 10rem);
+  cursor: pointer;
+}
+
+/* Nav row */
+.avaters {
+  display: flex;
+  gap: 3vw;
+  align-items: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 544;
+}
+
+/* nav links & button */
+.nav-item {
+  text-decoration: none;
+  color: inherit;
+  padding-bottom: 0.1rem;
+  transition: border-color 0.2s;
+}
+.nav-item:hover {
+  border-bottom: 2px solid #4fb0b3;
+}
+.contact-btn {
+  padding: 0.9rem 1.2rem;
+  border-radius: 15px;
+  background-color: #4fb0b3;
+  color: #000;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 549;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.contact-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+}
+
+/* ----------------------------------------
+   Hamburger icon
+   ---------------------------------------- */
+.menu-toggle {
+  display: none;             /* show via media-query */
+  flex-direction: column;
+  justify-content: space-between;
+  width: 2rem;
+  height: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;            /* above the dropdown */
+}
+.menu-toggle span {
+  display: block;
+  height: 3px;
+  background-color: #000;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+/* X animation */
+.menu-toggle.open span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+.menu-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+.menu-toggle.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* ----------------------------------------
+   Desktop: show nav, hide burger
+   ---------------------------------------- */
+@media (min-width: 769px) {
+  .menu-toggle { display: none; }
+  .avaters {
+    display: flex !important;
+    position: static;
+    flex-direction: row;
+    background: none;
+    width: auto;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+/* ----------------------------------------
+   Mobile/Tablet: dropdown under fixed header
+   ---------------------------------------- */
+@media (max-width: 768px) {
+  .menu-toggle { display: flex; }
+
+  .avaters {
+    position: fixed;                 /* fixed so it sticks with header */
+    top: var(--header-h);            /* sit right below the header */
+    left: 0;
+    width: 100%;
+    background-color: rgb(241, 238, 238);
+    flex-direction: column;
+    max-height: 0;                   /* collapsed */
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 999;                    /* under header but above content */
+  }
+  .avaters.mobile-open {
+    max-height: 300px;               /* adjust based on items */
+  }
+
+  .nav-item,
+  .contact-btn {
+    width: 100%;
+    text-align: center;
+    padding: 0.75rem 1rem;
+  }
+}

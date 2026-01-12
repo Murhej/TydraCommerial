@@ -1,0 +1,251 @@
+/* ---------- Theme ---------- */
+:root{
+  --ink:#0b1320;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+  --bg:#f7f9fb;
+  --card:#ffffff;
+  --brand:#059669;         /* emerald */
+  --brand-2:#047857;       /* darker emerald */
+  --accent:#22c55e;
+  --ring: rgba(5,150,105,.25);
+}
+.extra-inputs{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: .9rem;
+  margin-top: .6rem;
+}
+.extra-field label{
+  display:block;
+  font-size:.9rem;
+  color: var(--muted);
+  margin-bottom:.35rem;
+}
+.inline-num{ display:flex; align-items:center; gap:.45rem; }
+.inline-num input[type="number"]{ margin:0; }
+.suffix{ font-weight:700; color: var(--muted); user-select:none; }
+
+/* ---------- Root Form ---------- */
+.Quote {
+  background: var(--card);
+  width: 96vw;
+  margin: 2rem auto;
+  border-radius: 18px;
+  padding: 1.75rem;
+  position: relative;
+  border: 1px solid rgba(2,6,23,0.04);
+  box-shadow:
+    0 2px 6px rgba(2,6,23,0.04),
+    0 16px 40px rgba(2,6,23,0.06);
+}
+/* Fancy inline number field */
+.fancy-input {
+  display: flex;
+  align-items: center;
+  background: #fbfdff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  padding: 0.35rem 0.75rem;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.fancy-input:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px var(--ring);
+}
+
+.fancy-input input[type="number"] {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  outline: none;
+}
+
+.fancy-input .suffix {
+  font-weight: 600;
+  color: var(--muted);
+  margin-left: 0.5rem;
+  white-space: nowrap;
+}
+
+/* Header */
+.Quote-header {
+  margin-bottom: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.Quote-header h2 {
+  font-size: clamp(1.1rem, 1rem + 1vw, 1.9rem);
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: .2px;
+}
+.rest-button {
+  padding: .55rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f9fafb;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all .2s ease;
+}
+.rest-button:hover { background: #eef2f7; border-color: #d1d5db; }
+
+/* ---------- Info Banner ---------- */
+.info-banner{
+  display:grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 16px;
+  background:
+    radial-gradient(1200px 200px at -10% -50%, rgba(14,165,233,.08), transparent 60%),
+    radial-gradient(1200px 200px at 120% 160%, rgba(34,197,94,.08), transparent 60%),
+    #f8fafc;
+  border: 1px dashed rgba(2,6,23,.08);
+  margin-bottom: 1rem;
+}
+.info-left h4{ margin:0 0 .25rem 0; font-size:1.05rem; color:var(--ink); }
+.info-left ol{ margin:.25rem 0 0 1rem; padding:0; color:var(--muted); line-height: 1.5; }
+.info-left .link{ color:#0ea5e9; text-decoration:none; border-bottom:1px dashed rgba(14,165,233,.4); }
+.info-left .link:hover{ border-bottom-style:solid; }
+
+/* mini referral in banner */
+.mini-code{ background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: .75rem; box-shadow: 0 3px 10px rgba(2,6,23,.06); }
+.mini-code-label{ display:block; font-size:.8rem; color: var(--muted); margin-bottom:.35rem; }
+
+/* ---------- Inputs ---------- */
+.Quote-body input[type="number"] {
+  width: 100%;
+  height: 3.1rem;
+  font-size: 1rem;
+  padding: 0.6rem .85rem;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  transition: .15s ease;
+  margin-bottom: 1.2rem;
+  background: #fbfdff;
+}
+.Quote-body input[type="number"]:focus {
+  border-color: var(--brand);
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ring);
+}
+
+/* ---------- Cards ---------- */
+.selected-message {
+  margin: 1.25rem 0;
+  padding: 1.25rem;
+  background: var(--card);
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 14px rgba(2, 6, 23, 0.06);
+}
+.selected-message h3 { margin-bottom: 1rem; font-size: 1.25rem; font-weight: 700; color: var(--ink); }
+.selected-message p { margin: 0.35rem 0; line-height: 1.6; }
+.selected-message button{ width: 100%; }
+.list-naem{ font-size: clamp(.9rem, .8rem + .4vw, 1rem); }
+
+/* ---------- Sub-sections ---------- */
+.traffic-category { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
+.traffic-category:last-child { margin-bottom: 0; border-bottom: none; }
+.traffic-category h4 { margin-bottom: .75rem; font-size: 1.05rem; font-weight: 700; color: #374151; }
+.traffic-category ul, .radio-selections { list-style: none; margin: 0; padding: 0; }
+
+/* grids */
+.radio-selections, .service-grid, .traffic-category ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: .9rem;
+  align-items: stretch;
+  text-align: center;
+}
+@media (max-width: 900px) {
+  .info-banner{ grid-template-columns: 1fr; }
+}
+
+/* options */
+.radio-option, .service-box, .number-option {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: .75rem;
+  margin: 0;
+  height: 100%;
+}
+.radio-option input, .service-box input, .number-option input { display: none; }
+.radio-option label, .service-box label, .number-option label {
+  display: flex; flex: 1 1 auto; align-items: center; justify-content: center;
+  padding: 1rem; border-radius: 12px; background: #fff; border: 1px solid var(--line);
+  cursor: pointer; transition: all .2s ease; font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  min-height: 4.4rem; height: 100%; box-sizing: border-box;
+}
+.radio-option label:hover, .service-box label:hover, .number-option label:hover {
+  border-color: var(--brand); transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+}
+input:checked + label {
+  background: var(--brand); color: #fff; font-weight: 700; border-color: var(--brand);
+  box-shadow: 0 8px 22px rgba(5,150,105,0.28);
+}
+
+/* ---------- Buttons ---------- */
+.next-button, button[type="submit"], .submit-cta {
+  margin-top: 1rem; padding: .8rem 1.2rem; background: var(--brand); color: #fff;
+  border: none; border-radius: 12px; font-weight: 800; cursor: pointer; transition: background .2s ease, transform .02s ease;
+}
+/* make anchor look like the main CTA */
+.submit-cta {
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  width: 100%;
+}
+
+.next-button:hover, button[type="submit"]:hover, .submit-cta:hover { background: var(--brand-2); }
+.next-button:active, .submit-cta:active { transform: translateY(1px); }
+
+/* Ghost button (for Copy/Generate) */
+.btn-ghost{
+  padding: .7rem 1rem; background: #f1f5f9; color: var(--ink);
+  border: 1px solid var(--line); border-radius: 10px; font-weight: 700; cursor: pointer;
+}
+.btn-ghost:hover{ background:#e8eef6; }
+
+/* ---------- Summary ---------- */
+.summary { border-left: 4px solid var(--brand); }
+.summary h3 { font-size: 1.35rem; color: #065f46; }
+.summary p { font-size: .98rem; }
+
+/* Referral block (shared row) */
+.refrow{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: .6rem;
+  align-items: center;
+}
+.refcode-input{
+  width: 100%;
+  height: 2.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  padding: 0 .8rem;
+  font-weight: 700;
+  letter-spacing: .3px;
+}
+
+/* Referral card in summary */
+.referral-card{
+  margin-top: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1rem;
+  background: #fcfefd;
+}
+.referral-head{ display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin-bottom:.5rem; }
+.referral-head h4{ margin:0; font-size:1.05rem; }
+.muted{ color: var(--muted); font-size:.9rem; }

@@ -1,0 +1,25 @@
+# --- env files (DO NOT COMMIT) ---
+.env
+backend/.env
+frontend/.env
+.env.*
+
+# --- node ---
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# --- python ---
+__pycache__/
+backend/__pycache__/
+*.pyc
+
+# --- database (local only) ---
+*.db
+backend/data.db
+
+# --- uploads (optional: ignore user uploads) ---
+backend/uploads/*
+!backend/uploads/.gitkeep
