@@ -10,7 +10,7 @@ import Measuring from "../assets/body/Measuring";
 import "./landingpage.css";
 
 import Amex from "../assets/Img/amex.svg";
-import Visa from "../assets/Img/Visa.svg";
+import Visa from "../assets/Img/visa.svg";
 import Mastercard from "../assets/Img/mastercard.svg";
 import Paypal from "../assets/Img/paypal.svg";
 
