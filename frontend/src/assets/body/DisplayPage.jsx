@@ -1,5 +1,5 @@
 import React, {useRef} from 'react';
-import DisplayImage from "../Img/DisplayFront.png";
+import CleaningIllustration from "../Img/CleaningIllustration.png";
 import "./displayPage.css";
 
 export default function DisplayPage({onNext}) {
@@ -21,7 +21,7 @@ export default function DisplayPage({onNext}) {
       </div>
       <div className="hero__image">
         <img
-          src={DisplayImage}
+          src={CleaningIllustration}
           alt="Illustration of a cleaner at work"
         />
       </div>
