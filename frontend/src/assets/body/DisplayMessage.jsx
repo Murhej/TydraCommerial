@@ -1,5 +1,6 @@
 import React from "react";
-import "./DisplayMessage.css";
+import "./displayMessage.css";
+
 
 const features = [
   {
