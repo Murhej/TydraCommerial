@@ -16,7 +16,7 @@ import Paypal from "../assets/Img/paypal.svg";
 
 import Facebook from "../assets/Img/icon-facebook.svg";
 import Instagram from "../assets/Img/icon-instagram.svg";
-import Tiktok from "../assets/Img/icon-tiktok.svg";
+import Tiktok from "../assets/Img/Tiktok.svg";
 
 function Landingpage() {
   const refQouteForm = useRef(null);
