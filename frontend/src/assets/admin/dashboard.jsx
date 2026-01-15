@@ -27,7 +27,8 @@ useEffect(() => {
       if (!res) return;
       const json = await res.json();
 
-      setLeads(json);
+      setLeads(json.filter(l => !l.deleted));
+
     } catch (err) {
       console.error("Failed to fetch leads:", err);
     }
@@ -782,9 +783,10 @@ const filteredLeads = leads
                 onClick={async () => {
                   try {
                     const payload = {
-                        referralCode: selected.referralCode,
-
+                      referralCode: selected.referralCode,
+                      ...draft,
                     };
+
 
                     const res = await fetch(
                       `${API_URL}/leads/${selected.referralCode}`,
