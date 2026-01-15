@@ -125,26 +125,26 @@ const openLead = async (t) => {
   const confirmDelete = window.confirm(
     `Are you sure you want to delete lead ${selected.referralCode}?`
   );
-
   if (!confirmDelete) return;
 
-    try {
-      const res = await authFetch(
-        `/leads/${selected.referralCode}`,
-        {
-          method: "DELETE",
-        }
-      );
+  try {
+    const payload = {
+      deleted: true,
+    };
 
+    const res = await authFetch(
+      `/leads/${selected.referralCode}`,
+      {
+        method: "PUT", // ✅ MUST be PUT
+        body: JSON.stringify(payload),
+      }
+    );
 
+    if (!res.ok) throw new Error("Failed to delete lead");
 
-    if (!res) return;
-    if (!res.ok) throw new Error("Failed to save lead");
-
-    // remove from list
+    // remove from UI immediately
     setLeads(prev => prev.filter(l => l.id !== selected.referralCode));
 
-    // close modal
     setViewInfo(false);
     setSelected(null);
     setDraft(null);
@@ -154,6 +154,7 @@ const openLead = async (t) => {
     alert(err.message);
   }
 };
+
 const filteredLeads = leads
   // 🔍 SEARCH
   .filter((lead) => {
