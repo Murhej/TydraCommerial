@@ -95,9 +95,7 @@ def init_db():
             created_at TEXT
         )
     """)
-    c.execute(
-        "SELECT referral, details FROM submissions WHERE deleted = 0 OR deleted IS NULL"
-    )
+
 
     # appointments
     c.execute("""
@@ -629,11 +627,9 @@ def create_invoice():
 def delete_lead(referral):
     conn = db()
     c = conn.cursor()
-
-    c.execute("DELETE FROM submissions WHERE referral = ?", (referral,))
+    c.execute("DELETE FROM submissions WHERE referral=?", (referral,))
     conn.commit()
     conn.close()
-
     return jsonify({"success": True})
 
 # ------------------ LEADS ------------------
@@ -670,31 +666,30 @@ def get_leads():
 
     return jsonify(leads)
 
-
 @app.route("/leads/<referral>", methods=["PUT"])
 def update_lead(referral):
-    data = request.json
-    if not data:
-        return jsonify({"error": "No data provided"}), 400
+    incoming = request.json or {}
 
     conn = db()
     c = conn.cursor()
+
+    c.execute("SELECT details FROM submissions WHERE referral=?", (referral,))
+    row = c.fetchone()
+    if not row:
+        conn.close()
+        return jsonify({"error": "Lead not found"}), 404
+
+    existing = json.loads(row[0])
+    existing.update(incoming)
+
     c.execute(
         "UPDATE submissions SET details=? WHERE referral=?",
-        (json.dumps(data), referral)
+        (json.dumps(existing), referral)
     )
+
     conn.commit()
     conn.close()
-
     return jsonify({"success": True})
-@app.route("/debug/invites", methods=["GET"])
-def debug_invites():
-    conn = sqlite3.connect("data.db")
-    c = conn.cursor()
-    c.execute("SELECT COUNT(*) FROM invite_codes")
-    n = c.fetchone()[0]
-    conn.close()
-    return jsonify({"invite_count": n})
 
 print("APP_SECRET_KEY loaded:", bool(APP_SECRET_KEY))
 print("INVITE_PEPPER loaded:", bool(INVITE_PEPPER))
