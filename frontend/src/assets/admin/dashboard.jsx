@@ -134,12 +134,10 @@ const openLead = async (t) => {
     };
 
     const res = await authFetch(
-      `/leads/${selected.referralCode}`,
-      {
-        method: "PUT", // ✅ MUST be PUT
-        body: JSON.stringify(payload),
-      }
-    );
+  `/leads/${selected.referralCode}`,
+  { method: "DELETE" }
+);
+
 
     if (!res.ok) throw new Error("Failed to delete lead");
 

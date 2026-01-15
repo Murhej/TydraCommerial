@@ -95,6 +95,9 @@ def init_db():
             created_at TEXT
         )
     """)
+    c.execute(
+        "SELECT referral, details FROM submissions WHERE deleted = 0 OR deleted IS NULL"
+    )
 
     # appointments
     c.execute("""
@@ -622,6 +625,16 @@ def create_invoice():
         "invoice_url": invoice.hosted_invoice_url
     })
 
+@app.route("/leads/<referral>", methods=["DELETE"])
+def delete_lead(referral):
+    conn = db()
+    c = conn.cursor()
+
+    c.execute("DELETE FROM submissions WHERE referral = ?", (referral,))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"success": True})
 
 # ------------------ LEADS ------------------
 @app.route("/leads", methods=["GET"])
