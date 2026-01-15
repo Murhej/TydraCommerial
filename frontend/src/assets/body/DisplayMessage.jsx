@@ -1,7 +1,7 @@
 import React from "react";
 import guarantee from "../Img/guarantee.png";
 import DollarSign from "../Img/DollarSign.png";
-import location from "../Img/location.png";
+import location from "../Img/Location.png";
 import staff from "../Img/staff.png";
 import leafIcon from "../Img/leafIcon.png";
 import "./displayMessage.css";
