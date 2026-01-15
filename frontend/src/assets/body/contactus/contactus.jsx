@@ -4,14 +4,15 @@ import {API_URL} from "../../../config"
 import emailjs from "@emailjs/browser";
 import "./ContactInfo.css";
 
-import Amex from "../assets/Img/amex.svg";
-import Visa from "../assets/Img/visa.svg";
-import Mastercard from "../assets/Img/mastercard.svg";
-import Paypal from "../assets/Img/paypal.svg";
+import Amex from "../../Img/amex.svg";
+import Visa from "../../Img/visa.svg";
+import Mastercard from "../../Img/mastercard.svg";
+import Paypal from "../../Img/paypal.svg";
 
-import Facebook from "../assets/Img/icon-facebook.svg";
-import Instagram from "../assets/Img/icon-instagram.svg";
-import Tiktok from "../assets/Img/Tiktok.svg";
+import Facebook from "../../Img/icon-facebook.svg";
+import Instagram from "../../Img/icon-instagram.svg";
+import Tiktok from "../../Img/Tiktok.svg";
+
 
 export default function ContactInfo() {
   const [formData, setFormData] = useState({
