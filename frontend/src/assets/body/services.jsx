@@ -3,7 +3,6 @@ import Header from "../header/HeaderPage";
 import "./services.css";
 
 import Amex from "../Img/amex.svg";
-import Amex from "../Img/amex.svg";
 import Visa from "../Img/visa.svg";
 import Mastercard from "../Img/mastercard.svg";
 import Paypal from "../Img/paypal.svg";
