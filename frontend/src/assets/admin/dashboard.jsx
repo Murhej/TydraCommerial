@@ -132,8 +132,7 @@ const openLead = async (t) => {
       const res = await authFetch(
         `/leads/${selected.referralCode}`,
         {
-          method: "PUT",
-          body: JSON.stringify(payload),
+          method: "DELETE",
         }
       );
 
@@ -782,8 +781,8 @@ const filteredLeads = leads
                 onClick={async () => {
                   try {
                     const payload = {
-                      ...selected,
-                      ...draft,
+                        referralCode: selected.referralCode,
+
                     };
 
                     const res = await fetch(
