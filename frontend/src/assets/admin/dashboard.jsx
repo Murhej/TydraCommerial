@@ -83,7 +83,7 @@ useEffect(() => {
 const openLead = async (t) => {
   try {
         // 1️⃣ Fetch EVERYTHING by referral code
-    const res = await authFetch(`${API_URL}/data/${t.id}`);
+    const res = await authFetch(`/data/${t.id}`);
     if (!res) return;
     const json = await res.json();
 
@@ -130,13 +130,14 @@ const openLead = async (t) => {
 
     try {
       const res = await authFetch(
-    `${API_URL}/leads/${selected.referralCode}`,
-    {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    }
-    );
+        `/leads/${selected.referralCode}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        }
+      );
+
+
 
     if (!res) return;
     if (!res.ok) throw new Error("Failed to save lead");
