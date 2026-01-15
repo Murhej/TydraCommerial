@@ -82,7 +82,7 @@ export default function Settings() {
       setSettings(loadLocalSettings());
 
       try {
-        const res = await fetch(`${API_BASE}/profile`, {
+        const res = await fetch(`${API_URL}/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -122,7 +122,7 @@ export default function Settings() {
     // 2) save profile (account tab fields)
     try {
       if (profile) {
-        const res = await fetch(`${API_BASE}/profile`, {
+        const res = await fetch(`${API_URL}/profile`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -160,7 +160,7 @@ export default function Settings() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await fetch(`${API_BASE}/profile/avatar`, {
+      const res = await fetch(`${API_URL}/profile/avatar`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -197,7 +197,7 @@ export default function Settings() {
 
     // If you don’t have this endpoint yet, it will show a warning.
     try {
-      const res = await fetch(`${API_BASE}/change_password`, {
+      const res = await fetch(`${API_URL}/change_password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

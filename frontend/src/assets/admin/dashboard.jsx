@@ -23,7 +23,7 @@ export default function Dashboard() {
 useEffect(() => {
   const fetchLeads = async () => {
     try {
-      const res = await authFetch(`${API_URL}/leads`);
+      const res = await authFetch(`/leads`);
       if (!res) return;
       const json = await res.json();
 
