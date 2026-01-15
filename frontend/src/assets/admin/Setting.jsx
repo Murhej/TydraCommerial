@@ -306,7 +306,7 @@ export default function Settings() {
                           src={
                             preview ||
                             (profile?.avatar
-                              ? `${API_BASE}${profile.avatar}`
+                              ? `${API_URL}${profile.avatar}`
                               : "https://via.placeholder.com/120")
                           }
                           alt="avatar"
