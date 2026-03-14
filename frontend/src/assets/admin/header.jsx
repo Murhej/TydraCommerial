@@ -1,75 +1,76 @@
-import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { API_URL } from "../../config"; // adjust path if needed
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { API_URL } from "../../config";
+import { ApiError, apiGet } from "../../lib/apiClient";
 
 import frontlogo from "../Img/frontlogo.png";
 import logoDisplay from "../Img/logoDisplay.png";
-import hamburger from "../Img/hamburger.gif";
-import "./dashboard.css";
+import "./header.css";
 
-/* ---------------- Dashboard Navigation ---------------- */
 function DashboardNav({ onNavigate }) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const go = (path) => {
-    onNavigate?.(); // closes burger if provided
+    onNavigate?.();
     navigate(path);
   };
 
+  const navBtnClass = (path) =>
+    `site-btn${location.pathname === path ? " active" : ""}`;
+
   return (
-    <nav className="dashboard-nav">
-      <button className="site-btn" onClick={() => go("/payments")}>
-        Payment
+    <nav className="dashboard-nav" aria-label="Admin navigation">
+      <button className={navBtnClass("/payments")} onClick={() => go("/payments")}>
+        Payments
       </button>
-      <button className="site-btn" onClick={() => go("/calendar")}>
+      <button className={navBtnClass("/calendar")} onClick={() => go("/calendar")}>
         Calendar
       </button>
-      <button className="site-btn" onClick={() => go("/todo")}>
-        To-Do
+      <button className={navBtnClass("/todo")} onClick={() => go("/todo")}>
+        Operations
       </button>
     </nav>
   );
 }
 
-/* ---------------- Profile Menu ---------------- */
-function ProfileNav({
+function ProfileMenu({
   menuRef,
-  showProfile,
-  toggleProfile,
-  onLogout,
-  navigate,
   profile,
-  closeBurger, // ✅ added for mobile
+  showProfile,
+  setShowProfile,
+  onLogout,
+  closeBurger,
 }) {
+  const navigate = useNavigate();
+
   const go = (path) => {
-    toggleProfile?.();     // close the dropdown
-    closeBurger?.();       // close the side menu on mobile
+    setShowProfile(false);
+    closeBurger?.();
     navigate(path);
   };
 
   return (
     <div className="profile-menu" ref={menuRef}>
-      <button className="site-btn-10" onClick={toggleProfile}>
+      <button
+        className="site-btn-10"
+        type="button"
+        onClick={() => setShowProfile((p) => !p)}
+        aria-expanded={showProfile}
+        aria-label="Open profile menu"
+      >
         <img
-          src={
-            profile?.avatar
-              ? `${API_URL}${profile.avatar}`
-              : logoDisplay
-          }
+          src={profile?.avatar ? `${API_URL}${profile.avatar}` : logoDisplay}
           alt="profile"
           className="header-avatar"
         />
       </button>
 
       {showProfile && (
-        <div className="burgerView">
+        <div className="profile-popover">
           <div className="profile-summary">
             <img
-              src={
-                profile?.avatar
-                  ? `${API_URL}${profile.avatar}`
-                  : logoDisplay
-              }
+              src={profile?.avatar ? `${API_URL}${profile.avatar}` : logoDisplay}
               alt="avatar"
             />
             <div>
@@ -78,16 +79,16 @@ function ProfileNav({
             </div>
           </div>
 
-          <button className="Probutton" onClick={() => go("/profile")}>
+          <button className="profile-item" type="button" onClick={() => go("/dashboard")}>
+            Dashboard
+          </button>
+          <button className="profile-item" type="button" onClick={() => go("/profile")}>
             Profile
           </button>
-
-          {/* ✅ FIXED: navigate to settings */}
-          <button className="Probutton" onClick={() => go("/settings")}>
+          <button className="profile-item" type="button" onClick={() => go("/settings")}>
             Settings
           </button>
-
-          <button className="logoutbutton" onClick={onLogout}>
+          <button className="profile-item danger" type="button" onClick={onLogout}>
             Log Out
           </button>
         </div>
@@ -96,115 +97,141 @@ function ProfileNav({
   );
 }
 
-/* ---------------- Header Component ---------------- */
 export default function Header() {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const menuRef = useRef(null);
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
   const [showProfile, setShowProfile] = useState(false);
   const [showBurger, setShowBurger] = useState(false);
-  const navigate = useNavigate();
-  const [profileData, setProfileData] = useState(null);
-  const token = localStorage.getItem("token");
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
-    if (!token) return;
+    const onResize = () => setIsMobile(window.innerWidth < 900);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
-    fetch(`${API_URL}/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => setProfileData(data))
-      .catch(() => setProfileData(null));
-  }, [token]);
+  useEffect(() => {
+    setShowBurger(false);
+    setShowProfile(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const onOutsideClick = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowProfile(false);
+      }
+    };
+    document.addEventListener("mousedown", onOutsideClick);
+    return () => document.removeEventListener("mousedown", onOutsideClick);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadProfile() {
+      try {
+        const data = await apiGet("/profile", { auth: true });
+        if (!cancelled) setProfile(data);
+      } catch (err) {
+        if (cancelled) return;
+        if (err instanceof ApiError && err.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/login", { replace: true });
+          return;
+        }
+        setProfile(null);
+      }
+    }
+
+    loadProfile();
+    return () => {
+      cancelled = true;
+    };
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setProfileData(null);
     setShowProfile(false);
     setShowBurger(false);
     navigate("/login", { replace: true });
   };
 
-  const menuRef = useRef(null);
-
-  const toggleProfile = () => setShowProfile((p) => !p);
-  const toggleBurger = () => setShowBurger((b) => !b);
-
-  /* Close profile when clicking outside */
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setShowProfile(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  /* Track screen resize */
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
   return (
     <>
-      {/* ---------------- Top Header ---------------- */}
       <header className="dashboard-header">
-        <div className="logo">
-          <img
-            src={frontlogo}
-            alt="logo"
-            onClick={() => navigate("/dashboard")}
-          />
+        <div className="dashboard-logo">
+          <img src={frontlogo} alt="Tydra logo" onClick={() => navigate("/dashboard")} />
         </div>
 
-        {/* Mobile hamburger */}
-        {isMobile && (
-          <img
-            className="burgermeanu"
-            src={hamburger}
-            alt="menu"
-            onClick={toggleBurger}
-          />
-        )}
-
-        {/* Desktop navigation */}
         {!isMobile && <DashboardNav />}
 
-        {/* Desktop profile */}
-        {!isMobile && (
-          <ProfileNav
+        <div className="header-actions">
+          {isMobile && (
+            <button
+              type="button"
+              className="burger-toggle"
+              onClick={() => setShowBurger((b) => !b)}
+              aria-expanded={showBurger}
+              aria-label="Toggle mobile menu"
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          )}
+
+          <ProfileMenu
             menuRef={menuRef}
+            profile={profile}
             showProfile={showProfile}
-            toggleProfile={toggleProfile}
-            navigate={navigate}
-            profile={profileData}
+            setShowProfile={setShowProfile}
             onLogout={handleLogout}
-          />
-        )}
-      </header>
-
-      {/* ---------------- Mobile Side Panel ---------------- */}
-      {isMobile && showBurger && (
-        <div className="smallerwindowReview">
-          <button className="close-burger" onClick={toggleBurger}>
-            X
-          </button>
-
-          <DashboardNav onNavigate={() => setShowBurger(false)} />
-
-          {/* ✅ FIXED: pass all required props for mobile too */}
-          <ProfileNav
-            menuRef={menuRef}
-            showProfile={showProfile}
-            toggleProfile={toggleProfile}
-            navigate={navigate}
-            profile={profileData}
-            onLogout={handleLogout}
-            closeBurger={() => setShowBurger(false)}
           />
         </div>
+      </header>
+
+      {isMobile && showBurger && (
+        <aside className="mobile-panel" aria-label="Mobile navigation">
+          <DashboardNav onNavigate={() => setShowBurger(false)} />
+          <div className="mobile-user-block">
+            <button
+              type="button"
+              className="mobile-user-item"
+              onClick={() => {
+                setShowBurger(false);
+                navigate("/dashboard");
+              }}
+            >
+              Dashboard
+            </button>
+            <button
+              type="button"
+              className="mobile-user-item"
+              onClick={() => {
+                setShowBurger(false);
+                navigate("/profile");
+              }}
+            >
+              Profile
+            </button>
+            <button
+              type="button"
+              className="mobile-user-item"
+              onClick={() => {
+                setShowBurger(false);
+                navigate("/settings");
+              }}
+            >
+              Settings
+            </button>
+            <button type="button" className="mobile-user-item danger" onClick={handleLogout}>
+              Log Out
+            </button>
+          </div>
+        </aside>
       )}
     </>
   );

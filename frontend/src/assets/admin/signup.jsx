@@ -1,10 +1,14 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { API_URL } from "../../config";
-import { useNavigate } from "react-router-dom";
+import { motion as Motion } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
+import { apiPost } from "../../lib/apiClient";
+import usePageMeta from "../../hooks/usePageMeta";
+import Button from "../../components/ui/Button";
+import { InlineNotice } from "../../components/ui/PageStates";
 import "./login.css";
 
 export default function Signup() {
+  usePageMeta("Admin Sign Up", "Create an authorized Tydra admin account.");
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -18,62 +22,41 @@ export default function Signup() {
 
   const navigate = useNavigate();
 
-  async function readResponse(res) {
-    // Works even if backend returns HTML/plain text
-    const text = await res.text();
-    try {
-      const json = JSON.parse(text);
-      return { json, text };
-    } catch {
-      return { json: null, text };
-    }
-  }
-
   const handleSubmit = async (e) => {
   e.preventDefault();
   setMessage("");
 
   if (username.includes(" ")) {
-    setMessage("❌ Username cannot contain spaces");
+    setMessage("Error: Username cannot contain spaces");
     return;
   }
 
   if (password !== confirmPassword) {
-    setMessage("❌ Passwords do not match");
+    setMessage("Error: Passwords do not match");
     return;
   }
 
   const invite = referral.trim();
   if (!invite) {
-    setMessage("❌ Invite code is required");
+    setMessage("Error: Invite code is required");
     return;
   }
 
   setLoading(true);
 
   try {
-    const res = await fetch(`${API_URL}/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        fullName: fullName.trim(),
-        username: username.trim().toLowerCase(),
-        email: email.trim().toLowerCase(),
-        password,
-        referral: invite,
-      }),
+    await apiPost("/register", {
+      fullName: fullName.trim(),
+      username: username.trim().toLowerCase(),
+      email: email.trim().toLowerCase(),
+      password,
+      referral: invite,
     });
 
-    const { json, text } = await readResponse(res);
-
-    if (res.ok) {
-      setMessage("✅ Account created! Redirecting to login...");
-      setTimeout(() => navigate("/login"), 900);
-    } else {
-      setMessage(`❌ ${json?.error || "Signup failed"}`);
-    }
-  } catch {
-    setMessage("❌ Backend not reachable");
+    setMessage("Account created. Redirecting to login...");
+    setTimeout(() => navigate("/login"), 900);
+  } catch (err) {
+    setMessage(`Error: ${err.message || "Signup failed"}`);
   } finally {
     setLoading(false);
   }
@@ -81,14 +64,15 @@ export default function Signup() {
 
   return (
     <div className="login-page">
-      {/* ✅ Removed the floating emoji/motion images */}
+      {/* Removed the floating emoji/motion images */}
       
-      <motion.div
+      <Motion.div
         className="login-card"
         initial={{ opacity: 0, scale: 0.92 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
       >
+        <div className="login-badge">Tydra Admin</div>
         <h2 className="login-title">Sign Up</h2>
         <p className="login-subtitle">Create your account to get started</p>
 
@@ -163,24 +147,22 @@ export default function Signup() {
 
         
 
-          <motion.button
-            type="submit"
-            className="login-btn"
-            whileHover={{ scale: loading ? 1 : 1.05 }}
-            whileTap={{ scale: loading ? 1 : 0.98 }}
-            disabled={loading}
-            style={{ opacity: loading ? 0.7 : 1 }}
-          >
-            {loading ? "Creating..." : "Sign Up"}
-          </motion.button>
+          <Motion.div whileHover={{ scale: loading ? 1 : 1.01 }} whileTap={{ scale: loading ? 1 : 0.995 }}>
+            <Button type="submit" variant="primary" size="lg" loading={loading} className="login-btn">
+              Sign Up
+            </Button>
+          </Motion.div>
         </form>
 
-        {message && <p style={{ marginTop: "1rem" }}>{message}</p>}
+        <InlineNotice tone={message.toLowerCase().includes("error") ? "error" : "success"} className="login-message">
+          {message}
+        </InlineNotice>
 
         <p className="signup-link">
-          Already have an account? <a href="/login">Login</a>
+          Already have an account? <Link to="/login">Login</Link>
         </p>
-      </motion.div>
+      </Motion.div>
     </div>
   );
 }
+

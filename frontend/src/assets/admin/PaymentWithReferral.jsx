@@ -44,7 +44,7 @@ export default function PaymentWithReferral() {
     setLoading(true);
     setMessage("");
 
-    try:
+    try {
       const cs = clientSecret || (await createIntent());
       const card = elements.getElement(CardElement);
 

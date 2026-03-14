@@ -6,6 +6,7 @@ import DisplayMessage from "../assets/body/DisplayMessage";
 import ServicesGrid from "../assets/body/ServicesGrid";
 import QuoteForm from "../assets/body/QuoteForm";
 import Measuring from "../assets/body/Measuring";
+import usePageMeta from "../hooks/usePageMeta";
 
 import "./landingpage.css";
 
@@ -21,11 +22,15 @@ import Tiktok from "../assets/Img/Tiktok.svg";
 
 
 function Landingpage() {
-  const refQouteForm = useRef(null);
+  usePageMeta(
+    "Commercial Cleaning Services",
+    "Professional commercial cleaning across Toronto and the GTA."
+  );
+  const refQuoteForm = useRef(null);
 
-  const goToQouteForm = () => {
-    if (refQouteForm.current) {
-      refQouteForm.current.scrollIntoView({
+  const goToQuoteForm = () => {
+    if (refQuoteForm.current) {
+      refQuoteForm.current.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
@@ -38,7 +43,7 @@ function Landingpage() {
 
       <div className="body">
         {/* display page */}
-        <DisplayPage onNext={goToQouteForm} />
+        <DisplayPage onNext={goToQuoteForm} />
 
         {/* Message */}
         <DisplayMessage />
@@ -48,7 +53,7 @@ function Landingpage() {
         <Measuring />
 
         {/* Quote */}
-        <QuoteForm innerRef={refQouteForm} />
+        <QuoteForm innerRef={refQuoteForm} />
       </div>
 
       <footer className="footer">
@@ -64,8 +69,8 @@ function Landingpage() {
           {/* Business Hours */}
           <div className="footer__column">
             <h3 className="footer__header">Business Hours</h3>
-            <p>Mon–Fri: 9 am–6 pm</p>
-            <p>Sat: 10 am–6 pm</p>
+            <p>Mon-Fri: 9 am-6 pm</p>
+            <p>Sat: 10 am-6 pm</p>
             <p>Sun: Closed</p>
           </div>
 
@@ -116,3 +121,4 @@ function Landingpage() {
 }
 
 export default Landingpage;
+

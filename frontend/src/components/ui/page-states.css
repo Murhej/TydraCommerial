@@ -1,0 +1,105 @@
+.ui-inline-notice {
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.ui-inline-notice.info {
+  color: #1d4ed8;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.ui-inline-notice.success {
+  color: #166534;
+  background: #ecfdf5;
+  border-color: #86efac;
+}
+
+.ui-inline-notice.warning {
+  color: #92400e;
+  background: #fffbeb;
+  border-color: #fcd34d;
+}
+
+.ui-inline-notice.error {
+  color: #991b1b;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.ui-inline-notice.neutral {
+  color: #334155;
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.ui-empty-state {
+  margin: 12px 0 0;
+  border: 1px dashed #cbd5e1;
+  border-radius: 14px;
+  background: #f8fafc;
+  text-align: center;
+  padding: 18px 16px;
+}
+
+.ui-empty-state h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+.ui-empty-state p {
+  margin: 7px 0 0;
+  color: #64748b;
+}
+
+.ui-empty-state.compact {
+  padding: 14px;
+}
+
+.ui-empty-action {
+  margin-top: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #0f172a;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 8px 12px;
+}
+
+.ui-empty-action:hover {
+  background: #f8fafc;
+}
+
+.ui-skeleton-table {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.ui-skeleton-row {
+  display: grid;
+  gap: 10px;
+}
+
+.ui-skeleton-cell {
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 240% 100%;
+  animation: skeletonShimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes skeletonShimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}

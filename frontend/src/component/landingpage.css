@@ -1,83 +1,155 @@
-/* landingpage.css */
-
-/* Outer page wrapper: full viewport height + width */
-
 .landingBody {
-  width: 100%;               /* use full container width */
-  min-height: 100vh;         /* full viewport height */
+  width: 100%;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  overflow-x: hidden;        /* hide any accidental overflow */
+  overflow-x: hidden;
+  background:
+    radial-gradient(1000px 300px at 10% -20%, rgba(20, 184, 166, 0.12), transparent 60%),
+    radial-gradient(1000px 300px at 100% -20%, rgba(14, 165, 233, 0.1), transparent 60%),
+    #f4f8fb;
 }
 
-/* Reserve space equal to header height so content starts below it */
 .landingBody .body {
   flex: 1;
-  width: 100%;               /* inherit container width */
+  width: var(--container-public);
+  max-width: none;
   margin: 0 auto;
-  padding: 5rem 1rem 1rem;   /* top padding = header height */
+  padding: clamp(0.9rem, 1.4vw, 1.2rem) clamp(0.9rem, 1.8vw, 1.35rem) 2rem;
   box-sizing: border-box;
 }
 
+.landingBody .body > section {
+  margin-bottom: clamp(1.1rem, 1.8vw, 2rem);
+}
+
+.landingBody .body > .hero {
+  min-height: clamp(510px, 58vw, 680px);
+}
+
+.landingBody .body > .features {
+  min-height: 280px;
+}
+
+.landingBody .body > .service-page {
+  min-height: 520px;
+}
+
+.landingBody .body > .measurings {
+  min-height: 420px;
+}
+
 .footer {
-  background-color: #eceeec;
-  padding: 2rem 1.7rem;
+  background: linear-gradient(180deg, #f7fbff 0%, #edf3f9 100%);
+  border-top: 1px solid #dce7f2;
+  padding: 2.5rem 1.7rem;
   width: 100%;
   box-sizing: border-box;
 }
 
-  
+.footer__container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  max-width: 1280px;
+  margin: 0 auto;
+  gap: 1.4rem;
+}
+
+.footer__column {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.footer__header {
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+  color: #0f2b46;
+}
+
+.footer__column p {
+  margin: 0.25rem 0;
+  font-size: 0.92rem;
+  color: #334155;
+}
+
+.footer__social-icons,
+.footer__payment-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.footer__social-icons img {
+  width: 1.6rem;
+  height: auto;
+}
+
+.footer__payment-icons img {
+  width: 2.1rem;
+  height: auto;
+}
+
+.footer__social-icons a:focus,
+.footer__social-icons a:hover {
+  outline: 2px solid #14b8a6;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (max-width: 720px) {
+  .landingBody .body {
+    padding: 0.9rem 0.8rem 1.4rem;
+  }
+
+  .footer {
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (max-width: 980px) {
+  .landingBody .body {
+    padding: 0.85rem 0.8rem 1.5rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .landingBody .body {
+    width: min(100%, 99vw);
+    padding: 0.75rem 0.68rem 1.35rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .landingBody .body {
+    width: 100%;
+    padding: 0.65rem 0.5rem 1.1rem;
+  }
+
+  .landingBody .body > .hero,
+  .landingBody .body > .features,
+  .landingBody .body > .service-page,
+  .landingBody .body > .measurings {
+    min-height: unset;
+  }
+}
+
+@media (max-width: 1080px) {
   .footer__container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    max-width: 2200px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.2rem 1.6rem;
   }
-  
-  .footer__column {
-    flex: 1 1 200px;   /* flexible, but never smaller than 200px */
-    display: flex;
-    flex-direction: column;
+}
+
+@media (max-width: 620px) {
+  .footer__container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
-  
-  .footer__header {
-    margin-bottom: 0.5rem;
-    font-size: 1.25rem;
-    color: #072442;
-  }
-  
-  .footer__column p {
-    margin: 0.25rem 0;
-    font-size: 0.9rem;
-    color: #333;
-  }
-  
-  /* Social & payment icon rows */
-  .footer__social-icons,
-  .footer__payment-icons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-top: 0.5rem;
-  }
-  
-  .footer__social-icons img {
-    width: 1.6rem;
-    height: auto;
-  }
-  
-  .footer__payment-icons img {
-    width: 2.1rem;
-    height: auto;
-  }
-  
-  /* Make sure links have a focus state for a11y */
-  .footer__social-icons a:focus,
-  .footer__social-icons a:hover {
-    outline: 2px solid #61bbac;
-    outline-offset: 2px;
-  }
-  
+}

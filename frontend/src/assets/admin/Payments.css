@@ -1,175 +1,341 @@
-/* -------- Key-Value Vertical Blocks -------- */
-.vblock{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  padding:10px 0;
-  border-bottom:1px solid rgba(0,0,0,.08);
-
+.payment-wrapper {
+  min-height: 100vh;
+  width: 100%;
+  background:
+    radial-gradient(1000px 280px at 12% -20%, rgba(20, 184, 166, 0.1), transparent 60%),
+    radial-gradient(1000px 280px at 100% -20%, rgba(59, 130, 246, 0.08), transparent 60%),
+    #f4f8fc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: "Plus Jakarta Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #0f172a;
 }
 
-.vblock:last-child{
-  border-bottom:none;
+.payment-wrapper .searchRefBar {
+  width: min(1080px, 100%);
+  padding: 20px 14px 0;
+  text-align: center;
 }
 
-.vblock .k{
-  font-size:12px;
-  text-transform:uppercase;
-  letter-spacing:.08em;
-  color:#666;
-  font-weight:700;
+.payment-wrapper .searchRefBar h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 1.1rem + 1.3vw, 2.2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
-.vblock .v{
-  font-size:15px;
-  font-weight:600;
-  color:#111;
-  padding-left:4px;
+.payment-wrapper .lookupRow {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 124px;
+  gap: 8px;
 }
 
-/* -------- Page Layout -------- */
-.payment-wrapper{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  background:#f6f8fb;
-  min-height:100vh;
-  width: 100vw;
+.payment-wrapper .referInput {
+  width: 100%;
+  height: 46px;
+  border: 1px solid #d6e2ee;
+  border-radius: 12px;
+  padding: 0 12px;
+  font-size: 0.96rem;
+  background: #fff;
 }
 
-/* -------- Header -------- */
-.searchRefBar{
-  padding:20px;
-  text-align:center;
-  width:100%;
-  max-width:1200px;
+.payment-wrapper .referInput:focus {
+  outline: none;
+  border-color: #2dd4bf;
+  box-shadow: 0 0 0 4px rgba(45, 212, 191, 0.16);
 }
 
-/* -------- Search Bar -------- */
-.lookupRow{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  margin-top:10px;
+.lookup-btn {
+  height: 46px;
+  border: none;
+  border-radius: 12px;
+  background: #0f766e;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
 }
 
-.referInput{
-  padding:12px 14px;
-  border-radius:10px 0 0 10px;
-  width:70vw;
-  max-width:800px;
-  border:1px solid #ccc;
-  font-size:16px;
+.lookup-btn:hover {
+  background: #0d9488;
 }
 
-.button{
-  background:#548bd6;
-  color:#fff;
-  border:none;
-  border-radius:0 10px 10px 0;
-  padding:13px 16px;
-  cursor:pointer;
-  font-size:15px;
+.viewBox {
+  width: 100%;
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  padding: 0 14px 24px;
+  box-sizing: border-box;
 }
 
-/* -------- Container -------- */
-.viewBox{
-  width:100%;
-  margin-top:20px;
-  display:flex;
-  justify-content:center;
+.payment-empty {
+  width: min(1200px, 100%);
+  border-radius: 18px;
+  border: 1px solid #dbe5ef;
+  background: linear-gradient(145deg, #ffffff 0%, #f6fbff 100%);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.07);
+  padding: 28px 24px;
+  text-align: center;
 }
 
-/* -------- Main Card -------- */
-.Payments{
-  background:#ffffff;
-  padding:26px;
-  border-radius:14px;
-  width:85vw;
-  max-width:1200px;
-  box-shadow:0 10px 22px rgba(0,0,0,.08);
+.payment-empty h3 {
+  margin: 0 0 8px;
+  font-size: clamp(1.2rem, 1rem + 0.8vw, 1.8rem);
+  color: #0f2b46;
 }
 
-/* -------- Data Cards -------- */
-.kv-card{
-  background:#fff;
-  border-radius:14px;
-  padding:16px;
-  margin-bottom:18px;
-  box-shadow:0 4px 12px rgba(0,0,0,.06);
-  
-  /* Responsive grid layout */
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap:12px;
+.payment-empty p {
+  margin: 0;
+  color: #475569;
 }
 
-/* -------- Key-Value Rows -------- */
-.kv{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  border-bottom:1px solid rgba(0,0,0,.07);
-  padding:6px 2px;
+.Payments {
+  width: min(1080px, 100%);
+  background: #ffffff;
+  border: 1px solid #dbe5ef;
+  border-radius: 18px;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+  padding: 16px;
+  display: grid;
+  gap: 12px;
 }
 
-.kv:last-child{
-  border-bottom:none;
+.Payments h3 {
+  margin: 0 0 14px;
+  font-size: 1.35rem;
 }
 
-.k{
-  font-weight:600;
-  color:#444;
+.kv-card {
+  background: #fbfdff;
+  border: 1px solid #e6eef7;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
 
-.v{
-  color:#111;
-  font-weight:500;
-  text-align:right;
-  max-width:70%;
+.kv-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.09);
 }
 
-/* -------- Referral Code pill -------- */
-.code{
-  font-family:monospace;
-  background:#eef2ff;
-  padding:3px 7px;
-  border-radius:8px;
+.kv {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+  padding-bottom: 8px;
 }
 
-/* -------- Invoice Box -------- */
-.invoiceBox{
-  background:#fff;
-  padding:16px;
-  border-radius:12px;
-  box-shadow:0 6px 14px rgba(0,0,0,.07);
-  margin-bottom:18px;
+.kv:last-child {
+  border-bottom: none;
 }
 
-.input{
-  width:100%;
-  padding:10px;
-  margin-bottom:12px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  font-size:15px;
+.vblock {
+  padding-top: 2px;
 }
 
-.sendBtn{
-  width:100%;
-  background:#4caf50;
-  color:white;
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  font-size:16px;
-  font-weight:600;
+.k {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 800;
+  color: #64748b;
 }
 
-/* -------- Error -------- */
-.error{
-  color:#c62828;
-  margin-top:10px;
-  font-weight:600;
+.v {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.35;
+}
+
+.code {
+  font-family: Consolas, "Courier New", monospace;
+  background: #e2e8f0;
+  border: 1px solid #cbd5e1;
+  padding: 4px 8px;
+  border-radius: 8px;
+  width: fit-content;
+}
+
+.invoiceBox {
+  background: #ffffff;
+  border: 1px solid #dbe5ef;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  padding: 14px;
+}
+
+.invoiceBox h4 {
+  margin: 0 0 12px;
+  font-size: clamp(1.15rem, 1rem + 0.5vw, 1.36rem);
+}
+
+.input {
+  width: 100%;
+  height: 44px;
+  border: 1px solid #d1dce8;
+  border-radius: 10px;
+  padding: 0 12px;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #2dd4bf;
+  box-shadow: 0 0 0 4px rgba(45, 212, 191, 0.16);
+}
+
+.sendBtn {
+  width: 100%;
+  height: 46px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #16a34a, #059669);
+  color: white;
+  font-size: 0.98rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sendBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(5, 150, 105, 0.25);
+}
+
+.sendBtn:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.message-banner {
+  margin-top: 10px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.message-banner.error {
+  color: #991b1b;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.message-banner.success {
+  color: #166534;
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+}
+
+.message-banner.info {
+  color: #1e3a8a;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.fieldLabel {
+  display: block;
+  margin: 4px 0 6px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #475569;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.invoiceTypeRow {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.invoiceTypeText {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.hintText {
+  margin: 0 0 10px;
+  color: #334155;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.invoiceResult {
+  margin-top: 12px;
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.invoiceResult p {
+  margin: 4px 0;
+}
+
+.openInvoiceLink {
+  display: inline-block;
+  margin-top: 6px;
+  color: #0f766e;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.openInvoiceLink:hover {
+  text-decoration: underline;
+}
+
+.fieldError {
+  margin: -4px 0 8px;
+  color: #b91c1c;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+@media (max-width: 860px) {
+  .payment-wrapper .lookupRow {
+    grid-template-columns: 1fr;
+  }
+
+  .invoiceTypeRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .payment-wrapper .searchRefBar {
+    padding: 14px 10px 0;
+  }
+
+  .viewBox {
+    padding: 0 10px 16px;
+  }
+
+  .Payments {
+    border-radius: 14px;
+    padding: 12px;
+  }
+
+  .kv-card {
+    padding: 10px;
+    grid-template-columns: 1fr;
+  }
 }

@@ -1,140 +1,344 @@
 .measurings {
-  height: auto;
-  padding: 0.5rem 0rem 1rem;
-  background-color: #ffffff;
-
+  margin-top: 1rem;
+  border-radius: 18px;
+  border: 1px solid #dce7f2;
+  background: #ffffff;
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  min-height: 420px;
 }
 
-/* Tabs row */
+.pricing-head {
+  padding: 1rem 1rem 0.5rem;
+  text-align: center;
+}
+
+.pricing-head h3 {
+  margin: 0;
+  color: #0f2b46;
+  font-size: clamp(1.2rem, 1.05rem + 0.8vw, 1.65rem);
+}
+
+.pricing-head p {
+  margin: 0.25rem 0 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
 .Measuring-body {
   display: flex;
   justify-content: center;
-  gap: 0.75rem;
-  padding: 0.5rem 0;
+  gap: 0.65rem;
+  padding: 0.9rem;
+  background: linear-gradient(180deg, #f8fcff 0%, #f3f8fd 100%);
+  border-bottom: 1px solid #e4edf6;
 }
 
-/* Tab buttons */
 .tab {
   appearance: none;
-  border: 1px solid #e6e6e6;
-  background: #57a79c;
-  color: #faf6f6;
-  padding: 0.6rem 1rem;
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: clamp(0.9rem, 0.86rem + 0.3vw, 3rem);
+  min-width: 110px;
+  height: 42px;
+  border: 1px solid #d9e6f2;
+  background: #ffffff;
+  color: #334155;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-}
-.tab:hover { background: #efefef; }
-.tab.active {
-  background: #0b6b5f;
-  color: #fff;
-  border-color: #111;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  transition: all 0.18s ease;
 }
 
-/* Panels wrapper (animated) */
+.tab:hover {
+  background: #f1f5f9;
+}
+
+.tab.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.24);
+}
+
 .expand-wrapper {
   overflow: hidden;
-  transition: max-height 320ms ease, opacity 220ms ease;
   max-height: 0;
   opacity: 0;
-}
-.expand-wrapper.open {
-  max-height: 50rem; /* big enough */
-  opacity: 1;
-  display: flex;
-  justify-content: space-around;
+  transition: max-height 320ms ease, opacity 220ms ease;
 }
 
-/* Panels */
+.expand-wrapper.open {
+  max-height: 120rem;
+  opacity: 1;
+}
+
 .expand-Sqft,
 .expand-Hourly {
-  border-radius: 14px;
-  padding: 2rem;
-  margin: 0.5rem auto 0;
-  width: min(2560px, 100%);
-  box-shadow: inset 6px 0px 5px 10px rgba(0,0,0,0.03);
+  padding: 1.15rem;
 }
 
-/* SqFt panel layout: column on mobile, side-by-side on md+ */
+.expand-Contract {
+  padding: 1.15rem;
+}
+
 .expand-Sqft {
   display: grid;
-  grid-template-columns: 1fr;
   gap: 1rem;
 }
-@media (min-width: 760px) {
-  .expand-Sqft {
-    grid-template-columns: 1.2fr 1fr; /* text a bit wider */
-    align-items: center;
-  }
+
+.sqft-text {
+  display: grid;
+  gap: 0.7rem;
 }
-.sqft-text { display: grid; gap: 0.5rem; }
-.sqft-image { display: flex; justify-content: center; }
 
 .expand-Sqft-text {
   margin: 0;
-  color: #1f2937; /* slate-800 */
-  line-height: 1.5;
-  font-size: clamp(0.95rem, 0.9rem + 0.3vw, 5.05rem);
+  color: #334155;
+  line-height: 1.6;
+  font-size: 0.97rem;
 }
-.expand-Sqft-text.note { color: #374151; } /* slate-700 */
-.text-primary { color: #1e8c92; } /* sky-500-ish */
 
-.expand-Sqft img {
-  max-width: 100%;
-  max-height: 30rem;
-  object-fit: cover;
+.expand-Sqft-text.note {
+  padding: 0.8rem;
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(148,147,147,0.25);
+  background: #f9fbfe;
+  border: 1px solid #e2e8f0;
 }
 
-/* Hourly panel */
+.text-primary {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.pricing-recommendation {
+  margin: 0;
+  padding: 0.65rem 0.8rem;
+  border-radius: 10px;
+  border-left: 4px solid #0f766e;
+  border: 1px solid #d1fae5;
+  background: #ecfdf5;
+  color: #14532d;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.sqft-table-wrap {
+  border: 1px solid #dce7f2;
+  border-radius: 12px;
+  overflow: auto;
+  background: #ffffff;
+  scrollbar-width: thin;
+}
+
+.sqft-rate-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.sqft-rate-table th {
+  background: #214f5a;
+  color: #f8fafc;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  text-align: center;
+  padding: 0.82rem 0.7rem;
+  border-right: 2px solid rgba(255, 255, 255, 0.28);
+}
+
+.sqft-rate-table th:first-child {
+  text-align: left;
+  padding-left: 1rem;
+}
+
+.sqft-rate-table th:last-child {
+  border-right: none;
+}
+
+.sqft-rate-table td {
+  background: #c8d0d7;
+  color: #0f172a;
+  font-size: 0.95rem;
+  text-align: center;
+  padding: 0.86rem 0.6rem;
+  border-right: 2px solid rgba(255, 255, 255, 0.45);
+  border-top: 2px solid rgba(255, 255, 255, 0.45);
+}
+
+.sqft-rate-table td:first-child {
+  font-weight: 800;
+  background: #aebec8;
+}
+
+.sqft-rate-table td:last-child {
+  border-right: none;
+}
+
 .expand-Hourly {
   display: flex;
   justify-content: center;
-  align-items: center;
-
 }
-.hourly-box {
-  width: 100%;
-  max-width: 2560px;
-  background: #fff;
-  border: 1px solid #eee;
+
+.expand-Contract {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.contract-intro h4 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #0f172a;
+}
+
+.contract-intro p {
+  margin: 0.45rem 0 0;
+  color: #334155;
+  line-height: 1.55;
+}
+
+.contract-table-wrap {
+  border: 1px solid #dce7f2;
   border-radius: 12px;
-  padding: 1rem 1.25rem;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-}
-.hourly-box h4 {
-  margin: 0 0 6px;
-  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.2rem);
-  font-weight: 800;
-}
-.hourly-box p {
-  margin: 0.25rem 0 0.5rem;
-  color: #374151;
-  line-height: 1.5;
-  font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1rem);
-}
-.hourly-box ul {
-  margin: 0.25rem 0 0.75rem;
-  padding-left: 1.1rem;
-  color: #444;
-  line-height: 1.45;
-  font-size: clamp(0.93rem, 0.88rem + 0.2vw, 1rem);
-}
-.hourly-cta {
-  font-weight: 600;
-  color: #0f766e; /* teal-700 */
+  overflow: auto;
+  background: #ffffff;
 }
 
-/* Responsive tweaks */
-@media (max-width: 620px) {
-  .tab { padding: 0.55rem 0.85rem; }
-  .expand-Sqft img { max-height: 16rem; }
+.contract-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
 }
-@media (max-width: 360px) {
-  .tab { font-size: 0.9rem; }
-  .hourly-box { padding: 0.85rem 1rem; }
+
+.contract-table th {
+  background: #f8fbff;
+  color: #0f2b46;
+  text-align: left;
+  font-size: 0.92rem;
+  letter-spacing: 0.01em;
+  font-weight: 800;
+  padding: 0.78rem 0.8rem;
+  border-bottom: 1px solid #dce7f2;
+}
+
+.contract-table td {
+  padding: 0.78rem 0.8rem;
+  border-bottom: 1px solid #e7edf4;
+  color: #334155;
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+.contract-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.discount-badge {
+  display: inline-block;
+  padding: 0.24rem 0.62rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #78c88f, #4f9e68);
+  color: #ffffff;
+  font-size: 0.83rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.discount-badge.neutral {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.hourly-box {
+  width: min(920px, 100%);
+  background: #fbfdff;
+  border: 1px solid #dce7f2;
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+}
+
+.hourly-box h4 {
+  margin: 0 0 0.5rem;
+  font-size: 1.18rem;
+  color: #0f172a;
+}
+
+.hourly-box p {
+  margin: 0.3rem 0 0.55rem;
+  color: #334155;
+  line-height: 1.55;
+}
+
+.hourly-box ul {
+  margin: 0.2rem 0 0.75rem;
+  padding-left: 1.05rem;
+  color: #334155;
+  line-height: 1.45;
+}
+
+.hourly-cta {
+  color: #0f766e;
+  font-weight: 700;
+}
+
+@media (max-width: 1024px) {
+  .measurings {
+    min-height: unset;
+  }
+
+  .expand-Sqft,
+  .expand-Hourly,
+  .expand-Contract {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .pricing-head {
+    text-align: left;
+    padding: 0.85rem 0.8rem 0.35rem;
+  }
+
+  .Measuring-body {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding: 0.75rem 0.7rem;
+  }
+
+  .tab {
+    min-width: 102px;
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .Measuring-body {
+    padding: 0.8rem 0.6rem;
+    gap: 0.45rem;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .tab {
+    min-width: 92px;
+    height: 40px;
+    font-size: 0.86rem;
+    padding: 0.35rem 0.6rem;
+    flex: 0 0 auto;
+  }
+
+  .expand-Sqft,
+  .expand-Hourly,
+  .expand-Contract {
+    padding: 0.9rem;
+  }
+
+  .contract-table {
+    min-width: 560px;
+  }
+
+  .sqft-rate-table {
+    min-width: 700px;
+  }
 }

@@ -1,125 +1,255 @@
-import { useState, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "./header";
-import { API_URL } from "../../config";
+import { ApiError, apiDelete, apiGet, apiPut } from "../../lib/apiClient";
+import usePageMeta from "../../hooks/usePageMeta";
+import { EmptyState, InlineNotice, SkeletonRows } from "../../components/ui/PageStates";
+import PageHeader from "../../components/ui/PageHeader";
 import "./dashboard.css";
-import "../admin/Payments.css";
+
+const SHARED_SPACES_KEY = "Shared Spaces - (choose that apply)";
+
+const normalizeLeadDraft = (details = {}) => {
+  const footTrafficAnswers = details.footTrafficAnswers || {};
+  const cleaningAnswers = details.cleaningAnswers || {};
+  const conditionAnswers = details.conditionAnswers || {};
+
+  return {
+    ...details,
+    frequency: details.frequency || cleaningAnswers.Frequency || "",
+    footTraffic: details.footTraffic || footTrafficAnswers["Foot traffic"] || "",
+    operatingHours: details.operatingHours || footTrafficAnswers["Operating Hours"] || "",
+    sharedSpaces: Array.isArray(details.sharedSpaces)
+      ? details.sharedSpaces
+      : Array.isArray(footTrafficAnswers[SHARED_SPACES_KEY])
+      ? footTrafficAnswers[SHARED_SPACES_KEY]
+      : [],
+    addOns: Array.isArray(details.addOns)
+      ? details.addOns
+      : Array.isArray(details.serviceAddOns)
+      ? details.serviceAddOns
+      : [],
+    currentCondition:
+      details.currentCondition || conditionAnswers["Current Condition"] || "",
+    currentCond: details.currentCond || conditionAnswers["Current Problem"] || "",
+    servicePackage:
+      details.servicePackage ||
+      (details.pricingModel === "Flat monthly contract" ? "Premium" : "Basic"),
+  };
+};
+
+const buildLeadPayload = (raw = {}) => {
+  const cleaned = { ...raw };
+  cleaned.freqCount = cleaned.freqCount ? Number(cleaned.freqCount) : 0;
+  cleaned.freqTimesPerDay = cleaned.freqTimesPerDay ? Number(cleaned.freqTimesPerDay) : 0;
+  cleaned.specialRequests = Array.isArray(cleaned.specialRequests) ? cleaned.specialRequests : [];
+
+  const addOns = Array.isArray(cleaned.addOns)
+    ? cleaned.addOns
+    : Array.isArray(cleaned.serviceAddOns)
+    ? cleaned.serviceAddOns
+    : [];
+  const normalizedAddOns = addOns.map((a) => String(a).trim()).filter(Boolean);
+  cleaned.serviceAddOns = normalizedAddOns.includes("No add-on")
+    ? ["No add-on"]
+    : normalizedAddOns.filter((a) => a.toLowerCase() !== "no add-on");
+
+  cleaned.cleaningAnswers = {
+    ...(cleaned.cleaningAnswers || {}),
+    Frequency: cleaned.frequency || cleaned.cleaningAnswers?.Frequency || "",
+  };
+
+  cleaned.footTrafficAnswers = {
+    ...(cleaned.footTrafficAnswers || {}),
+    "Foot traffic": cleaned.footTraffic || cleaned.footTrafficAnswers?.["Foot traffic"] || "",
+    "Operating Hours": cleaned.operatingHours || cleaned.footTrafficAnswers?.["Operating Hours"] || "",
+    [SHARED_SPACES_KEY]: Array.isArray(cleaned.sharedSpaces)
+      ? cleaned.sharedSpaces
+      : cleaned.footTrafficAnswers?.[SHARED_SPACES_KEY] || [],
+  };
+
+  cleaned.conditionAnswers = {
+    ...(cleaned.conditionAnswers || {}),
+    "Current Condition":
+      cleaned.currentCondition || cleaned.conditionAnswers?.["Current Condition"] || "",
+    "Current Problem":
+      cleaned.currentCond || cleaned.conditionAnswers?.["Current Problem"] || "",
+  };
+
+  delete cleaned.addOnToAdd;
+  delete cleaned.sharedSpaceToAdd;
+  delete cleaned.specialRequestToAdd;
+
+  return cleaned;
+};
+
+const validateLeadDraft = (draft = {}) => {
+  const errors = {};
+  if (!String(draft.business_name || "").trim()) errors.business_name = "Business name is required.";
+  if (!String(draft.Ownername || "").trim()) errors.Ownername = "Owner name is required.";
+  if (!String(draft.email || "").trim()) {
+    errors.email = "Email is required.";
+  } else if (!/^\S+@\S+\.\S+$/.test(String(draft.email).trim())) {
+    errors.email = "Enter a valid email address.";
+  }
+  if (!String(draft.frequency || "").trim()) errors.frequency = "Cleaning frequency is required.";
+  if (!String(draft.pricingModel || "").trim()) errors.pricingModel = "Pricing model is required.";
+  if (!String(draft.servicePackage || "").trim()) errors.servicePackage = "Invoice package is required.";
+  if (!String(draft.invoiceFrequency || "").trim()) errors.invoiceFrequency = "Invoice frequency is required.";
+  if (
+    ["weekly", "bi-weekly"].includes(String(draft.invoiceFrequency || "").toLowerCase()) &&
+    !String(draft.invoiceDay || "").trim()
+  ) {
+    errors.invoiceDay = "Select an invoice day for weekly cycles.";
+  }
+  return errors;
+};
 
 
 
 
 
 export default function Dashboard() {
-  const [filter, setFilter] = useState("");
-
-  const menuRef = useRef(null);
-  const [vieInfo, setViewInfo] = useState(false)
+  const navigate = useNavigate();
+  const modalRef = useRef(null);
+  const [filter, setFilter] = useState("recent");
+  const [vieInfo, setViewInfo] = useState(false);
   const [selected, setSelected] = useState(null);
   const [search, setSearch] = useState("");
   const [draft, setDraft] = useState(null);
-
-
+  const [originalDraft, setOriginalDraft] = useState(null);
+  const [activeLeadTab, setActiveLeadTab] = useState("client");
+  const [modalNotice, setModalNotice] = useState("");
   const [leads, setLeads] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [notice, setNotice] = useState("");
+  usePageMeta("Admin Dashboard", "Review and manage commercial cleaning leads.");
+
+const leadErrors = useMemo(() => (draft ? validateLeadDraft(draft) : {}), [draft]);
+const isModalDirty = useMemo(() => {
+  if (!vieInfo || !draft || !originalDraft) return false;
+  return JSON.stringify(draft) !== JSON.stringify(originalDraft);
+}, [vieInfo, draft, originalDraft]);
 
 useEffect(() => {
   const fetchLeads = async () => {
+    setLoading(true);
+    setErrorMessage("");
     try {
-      const res = await authFetch(`/leads`);
-      if (!res) return;
-      const json = await res.json();
+      const json = await apiGet("/leads", { auth: true });
+      if (!Array.isArray(json)) {
+        throw new Error("Invalid leads response from server");
+      }
 
-      setLeads(json.filter(l => !l.deleted));
+      setLeads(json.filter((l) => !l.deleted));
 
     } catch (err) {
-      console.error("Failed to fetch leads:", err);
+      if (err instanceof ApiError && err.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/login", { replace: true });
+        return;
+      }
+      setErrorMessage(err.message || "Failed to fetch leads");
+    } finally {
+      setLoading(false);
     }
   };
 
-  fetchLeads(); // ✅ just call it (NO await)
-}, []);
- const authFetch = async (path, options = {}) => {
-  const token = localStorage.getItem("token");
+  fetchLeads();
+}, [navigate]);
 
-  const headers = new Headers(options.headers || {});
-
-  // Only set JSON header if you're not sending FormData
-  const isFormData = options.body instanceof FormData;
-  if (!isFormData && options.body && !headers.has("Content-Type")) {
-    headers.set("Content-Type", "application/json");
-  }
-
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
-  }
-
-  const url = `${API_URL}${path.startsWith("/") ? path : `/${path}`}`;
-
-  const res = await fetch(url, { ...options, headers });
-
-  // Optional: auto-handle expired/invalid token
-  if (res.status === 401) {
-    localStorage.removeItem("token");
-    // window.location.href = "/login"; // if you want auto-redirect
-  }
-
-  return res;
+const formatDateTime = (value) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleString();
 };
 
+const requestCloseLeadModal = useCallback(() => {
+  if (!vieInfo) return;
+  if (isModalDirty) {
+    const shouldClose = window.confirm("You have unsaved changes. Close without saving?");
+    if (!shouldClose) return;
+  }
+  setModalNotice("");
+  setViewInfo(false);
+}, [isModalDirty, vieInfo]);
 
+useEffect(() => {
+  if (!vieInfo || !isModalDirty) return undefined;
+  const onBeforeUnload = (event) => {
+    event.preventDefault();
+    event.returnValue = "";
+  };
+  window.addEventListener("beforeunload", onBeforeUnload);
+  return () => window.removeEventListener("beforeunload", onBeforeUnload);
+}, [isModalDirty, vieInfo]);
 
+useEffect(() => {
+  if (!vieInfo) return undefined;
+  const onKeyDown = (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      requestCloseLeadModal();
+      return;
+    }
 
+    if (event.key !== "Tab" || !modalRef.current) return;
+    const focusables = modalRef.current.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusables.length === 0) return;
 
-  // detect clicks outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setShowProfile(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
 
-
+  document.addEventListener("keydown", onKeyDown);
+  return () => document.removeEventListener("keydown", onKeyDown);
+}, [requestCloseLeadModal, vieInfo]);
 
 const openLead = async (t) => {
   try {
-        // 1️⃣ Fetch EVERYTHING by referral code
-    const res = await authFetch(`/data/${t.id}`);
-    if (!res) return;
-    const json = await res.json();
+    setNotice("");
+    setModalNotice("");
+    const json = await apiGet(`/data/${t.id}`, { auth: true });
 
-    if (!res.ok) throw new Error(json.error || "Failed to load lead");
+    // Store full backend payload
+    const normalizedDraft = normalizeLeadDraft(json.details || {});
 
-    // 2️⃣ Store full backend payload
     setSelected({
-    id: t.id,               // ✅ ADD THIS
-    referralCode: t.id,
-    company: t.company,
-    name: t.name,
-    ...json.details
-  });
+      id: t.id,
+      referralCode: t.id,
+      company: t.company,
+      name: t.name,
+      ...normalizedDraft,
+    });
 
+    setDraft(normalizedDraft);
+    setOriginalDraft(normalizedDraft);
+    setActiveLeadTab("client");
 
-    // 3️⃣ Editable copy
-    setDraft(json.details);
-
-    // 4️⃣ Open modal
+    // Open modal
     setViewInfo(true);
 
   } catch (err) {
-    alert(err.message);
+    if (err instanceof ApiError && err.status === 401) {
+      localStorage.removeItem("token");
+      navigate("/login", { replace: true });
+      return;
+    }
+    setNotice(err.message || "Failed to load lead details");
   }
 };
 
-
-  
-
-  // track screen resize
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
   const deleteLead = async () => {
   if (!selected?.referralCode) return;
 
@@ -129,17 +259,7 @@ const openLead = async (t) => {
   if (!confirmDelete) return;
 
   try {
-    const payload = {
-      deleted: true,
-    };
-
-    const res = await authFetch(
-  `/leads/${selected.referralCode}`,
-  { method: "DELETE" }
-);
-
-
-    if (!res.ok) throw new Error("Failed to delete lead");
+    await apiDelete(`/leads/${selected.referralCode}`, { auth: true });
 
     // remove from UI immediately
     setLeads(prev => prev.filter(l => l.id !== selected.referralCode));
@@ -147,15 +267,22 @@ const openLead = async (t) => {
     setViewInfo(false);
     setSelected(null);
     setDraft(null);
+    setOriginalDraft(null);
+    setModalNotice("");
 
-    alert("Lead deleted successfully");
+    setNotice("Lead deleted successfully.");
   } catch (err) {
-    alert(err.message);
+    if (err instanceof ApiError && err.status === 401) {
+      localStorage.removeItem("token");
+      navigate("/login", { replace: true });
+      return;
+    }
+    setNotice(err.message || "Failed to delete lead");
   }
 };
 
 const filteredLeads = leads
-  // 🔍 SEARCH
+  // Search
   .filter((lead) => {
     if (!search) return true;
 
@@ -167,8 +294,14 @@ const filteredLeads = leads
       lead.company?.toLowerCase().includes(q)
     );
   })
-  // 🧰 SORT / FILTER
+  // Sort / filter
   .sort((a, b) => {
+    if (filter === "recent") {
+      const at = new Date(a.submittedAt || 0).getTime();
+      const bt = new Date(b.submittedAt || 0).getTime();
+      return bt - at;
+    }
+
     if (filter === "A-Z") {
       return (a.company || "").localeCompare(b.company || "");
     }
@@ -188,6 +321,11 @@ const filteredLeads = leads
     return 0; // no filter
   });
 
+const uniqueCompanies = new Set(
+  leads.map((l) => (l.company || "").trim()).filter(Boolean)
+).size;
+
+const pendingWithoutEmail = leads.filter((l) => !(l.email || "").trim()).length;
 
 
 
@@ -197,25 +335,59 @@ const filteredLeads = leads
 
 
     <section className="info-Box">
+      <PageHeader
+        title="Lead Management"
+        subtitle="Review incoming referrals, update service details, and manage invoice settings."
+      />
       {/* Search + Filters */}
       <section className="dashboard-filters">
-        <div className="searchRefBar">
-          <div className="lookupRow">
-            <input
-              type="text"
-              placeholder="Search Refer code, clients, or businesses..."
-              className="referInput"
-              onChange={(e)=> setSearch(e.target.value)}
-            />
+        <div className="lookupRow">
+          <input
+            type="text"
+            placeholder="Search referral code, client, or business..."
+            className="referInput"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <select
+            className="dashboard-sort"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            aria-label="Sort leads"
+          >
+            <option value="recent">Most recent</option>
+            <option value="A-Z">Company A-Z</option>
+            <option value="Z-A">Company Z-A</option>
+            <option value="name">Client name</option>
+            <option value="Refer Code">Referral code</option>
+          </select>
+        </div>
+
+        <div className="dashboard-stats">
+          <div className="stat-chip">
+            <span>Total leads</span>
+            <strong>{leads.length}</strong>
+          </div>
+          <div className="stat-chip">
+            <span>Companies</span>
+            <strong>{uniqueCompanies}</strong>
+          </div>
+          <div className="stat-chip">
+            <span>Missing email</span>
+            <strong>{pendingWithoutEmail}</strong>
           </div>
         </div>
-     
-        
       </section>
 
       {/* Task List */}
       <section className="dashboard-list">
-        <h2 className="section-title">Tasks</h2>
+        <div className="dashboard-list-title">
+          <h2 className="section-title">Leads</h2>
+          <span className="list-count">{filteredLeads.length} shown</span>
+        </div>
+
+        <InlineNotice tone="success">{notice}</InlineNotice>
+        <InlineNotice tone="error">{errorMessage}</InlineNotice>
 
         {/* Table Header */}
         <div className="task-header">
@@ -226,119 +398,157 @@ const filteredLeads = leads
 
         {/* Table Rows */}
         <div>
+          {loading && <SkeletonRows rows={8} columns={3} />}
+
           {filteredLeads.map((t) => (
 
             <div className="task-row" key={t.id} onClick={() => openLead(t)}>
               <span>{t.id}</span>
-              <span>{t.company || "—"}</span>
-              <span>{t.name || "—"}</span>
+              <span>{t.company || "-"}</span>
+              <span>{t.name || "-"}</span>
             </div>
           ))}
         </div>
-        {filteredLeads.length === 0 && (
-          <p style={{ padding: "1rem" }}>No results found</p>
+        {!loading && filteredLeads.length === 0 && (
+          <EmptyState
+            compact
+            title="No leads found"
+            description="Try adjusting search or sort to find a lead."
+          />
         )}
 
       </section>
     </section>
 
-    {/* ✅ MODAL (keep it OUTSIDE the table/list markup) */}
+    {/* Modal (keep it outside the table/list markup) */}
     {vieInfo && draft && selected && (
-      <div
-        className="modal-overlay"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="lead-title"
-        onClick={() => setViewInfo(false)}
-      >
-        <div className="modal" onClick={(e) => e.stopPropagation()}>
-          <div className="modal-header">
-            <div>
-              <h3 id="lead-title">Selected Lead</h3>
+	      <div
+	        className="modal-overlay"
+	        role="dialog"
+	        aria-modal="true"
+	        aria-labelledby="lead-title"
+	        onClick={requestCloseLeadModal}
+	      >
+	        <div className="modal" ref={modalRef} onClick={(e) => e.stopPropagation()}>
+	          <div className="modal-header">
+	            <div>
+	              <h3 id="lead-title">Selected Lead</h3>
+                {isModalDirty && <span className="dirty-pill">Unsaved changes</span>}
 
-              <section className="kv-grid">
-                <div className="kv">
-                  <span className="k">Company Name</span>
-                  <input
-                    className="v"
-                    value={draft.business_name ?? selected.business_name ?? ""}
-                    onChange={(e) =>
-                      setDraft((d) => ({ ...d, business_name: e.target.value }))
-                    }
-                  />
-                </div>
+	              <section className="kv-grid lead-identity-grid">
+	                <div className="kv">
+	                  <span className="k">Company Name</span>
+	                  <input
+	                    className={`v${leadErrors.business_name ? " invalid" : ""}`}
+	                    value={draft.business_name ?? selected.business_name ?? ""}
+	                    onChange={(e) =>
+	                      setDraft((d) => ({ ...d, business_name: e.target.value }))
+	                    }
+	                  />
+                    {leadErrors.business_name && <span className="field-help error">{leadErrors.business_name}</span>}
+	                </div>
 
-                <div className="kv">
-                  <span className="k">Owner Name</span>
-                  <input
-                    className="v"
-                    value={draft.Ownername ?? selected.Ownername ?? ""}
-                    onChange={(e) =>
-                      setDraft((d) => ({ ...d, Ownername: e.target.value }))
-                    }
-                  />
-                </div>
-              </section>
-            </div>
+	                <div className="kv">
+	                  <span className="k">Owner Name</span>
+	                  <input
+	                    className={`v${leadErrors.Ownername ? " invalid" : ""}`}
+	                    value={draft.Ownername ?? selected.Ownername ?? ""}
+	                    onChange={(e) =>
+	                      setDraft((d) => ({ ...d, Ownername: e.target.value }))
+	                    }
+	                  />
+                    {leadErrors.Ownername && <span className="field-help error">{leadErrors.Ownername}</span>}
+	                </div>
+	              </section>
+	            </div>
 
-            <button
-              className="icon-btn"
-              onClick={() => setViewInfo(false)}
-              aria-label="Close"
-            >
-              ✕
-            </button>
-          </div>
+	            <button
+	              className="icon-btn"
+	              onClick={requestCloseLeadModal}
+	              aria-label="Close"
+	            >
+	              X
+	            </button>
+	          </div>
 
-          <div className="modal-body">
-            <section className="kv-grid">
-              <div className="kv">
-                <span className="k">Submitted At</span>
-                <span className="v">{selected.submittedAt ?? "—"}</span>
+	          <div className="modal-body">
+              <div className="lead-tabs" role="tablist" aria-label="Lead edit sections">
+                <button
+                  type="button"
+                  className={`lead-tab${activeLeadTab === "client" ? " active" : ""}`}
+                  onClick={() => setActiveLeadTab("client")}
+                >
+                  Client
+                </button>
+                <button
+                  type="button"
+                  className={`lead-tab${activeLeadTab === "service" ? " active" : ""}`}
+                  onClick={() => setActiveLeadTab("service")}
+                >
+                  Service
+                </button>
+                <button
+                  type="button"
+                  className={`lead-tab${activeLeadTab === "billing" ? " active" : ""}`}
+                  onClick={() => setActiveLeadTab("billing")}
+                >
+                  Billing
+                </button>
               </div>
+              <InlineNotice tone="error">{modalNotice}</InlineNotice>
 
-              <div className="kv">
-                <span className="k">ID</span>
-                <span className="v">{selected.id ?? "—"}</span>
-              </div>
+            {activeLeadTab === "client" && (
+              <>
+	            <h4 className="modal-section-title">Client Details</h4>
+	            <section className="kv-grid lead-contact-grid">
+	              <div className="kv">
+	                <span className="k">Submitted At</span>
+	                <span className="v">{formatDateTime(selected.submittedAt)}</span>
+	              </div>
 
-              <div className="kv">
-                <span className="k">Referral Code</span>
-                <span className="v code">{selected.referralCode ?? "—"}</span>
-              </div>
+	              <div className="kv">
+	                <span className="k">ID</span>
+	                <span className="v">{selected.id ?? "-"}</span>
+	              </div>
 
-              <div className="kv">
-                <span className="k">Email</span>
-                <input
-                  className="v"
-                  value={draft.email ?? selected.email ?? ""}
-                  onChange={(e) =>
-                    setDraft((d) => ({ ...d, email: e.target.value }))
-                  }
-                />
-              </div>
+	              <div className="kv">
+	                <span className="k">Referral Code</span>
+	                <span className="v code">{selected.referralCode ?? "-"}</span>
+	              </div>
 
-              <div className="kv full">
-                <span className="k">Message</span>
-                <input
-                  className="v message"
-                  value={draft.message ?? selected.message ?? ""}
-                  onChange={(e) =>
-                    setDraft((d) => ({ ...d, message: e.target.value }))
-                  }
-                />
-              </div>
-            </section>
+	              <div className="kv">
+	                <span className="k">Email</span>
+	                <input
+	                  className={`v${leadErrors.email ? " invalid" : ""}`}
+	                  value={draft.email ?? selected.email ?? ""}
+	                  onChange={(e) =>
+	                    setDraft((d) => ({ ...d, email: e.target.value }))
+	                  }
+	                />
+                  {leadErrors.email && <span className="field-help error">{leadErrors.email}</span>}
+	              </div>
 
-            <div className="divider" />
+	              <div className="kv full">
+	                <span className="k">Message</span>
+	                <input
+	                  className="v message"
+	                  value={draft.message ?? selected.message ?? ""}
+	                  onChange={(e) =>
+	                    setDraft((d) => ({ ...d, message: e.target.value }))
+	                  }
+	                />
+	              </div>
+	            </section>
+              </>
+            )}
 
-           
-                      <div className="divider" />
-
-                      <section className="kv-grid">
-                        <div className="kv">
-                          <span className="k">Sqft</span>
-                          <input
+            {activeLeadTab === "service" && (
+              <>
+	            <h4 className="modal-section-title">Service Preferences</h4>
+	                      <section className="kv-grid lead-work-grid">
+	                        <div className="kv">
+	                          <span className="k">Sqft</span>
+	                          <input
                             className="v"
                             value={draft.sqft ?? selected.sqft ?? ""}
                             onChange={(e) =>
@@ -348,30 +558,38 @@ const filteredLeads = leads
 
 
                         </div>
-                        <div className="kv">
-                          <span className="k">Frequency</span>
-                       <select
-                          value={draft?.frequency ?? selected?.frequency ?? ""}
-                          onChange={(e) =>
-                            setDraft(d => ({ ...d, frequency: e.target.value }))
+	                        <div className="kv">
+	                          <span className="k">Frequency</span>
+	                       <select
+                          className={`v${leadErrors.frequency ? " invalid" : ""}`}
+	                          value={draft?.frequency ?? selected?.frequency ?? ""}
+	                          onChange={(e) =>
+	                            setDraft(d => ({ ...d, frequency: e.target.value }))
                           }
                         >
 
-                            <option value="daily">Daily</option>
+                            <option value="Daily">Daily</option>
                             <option value="Weekly">Weekly</option>
-                            <option value="bi-weekly">bi-weekly</option>
-                            <option value="monthly">monthly</option>
-                            <option value="DeepClean">Deep Clean</option>
-                          </select>
+                            <option value="Bi-weekly">Bi-weekly</option>
+                            <option value="Monthly">Monthly</option>
+	                            <option value="One-time deep clean">One-time deep clean</option>
+	                          </select>
+                          {leadErrors.frequency && <span className="field-help error">{leadErrors.frequency}</span>}
 
-                        </div>
+	                        </div>
 
                         <div className="kv">
                           <span className="k">Industry</span>
 
                           <select 
-                          className="kv"
-                            name="SpaceDetail" id="SpaceDetail">
+                          className="v"
+                            name="SpaceDetail"
+                            id="SpaceDetail"
+                            value={draft?.selectedIndustry ?? selected?.selectedIndustry ?? ""}
+                            onChange={(e) =>
+                              setDraft((d) => ({ ...d, selectedIndustry: e.target.value }))
+                            }
+                          >
                           
                             <option value="Corporate Offices & Co-Working Spaces">Corporate Offices & Co-Working Spaces</option>
                             <option value="Medical & Healthcare">Medical & Healthcare</option>
@@ -387,7 +605,7 @@ const filteredLeads = leads
                             <span className="k">Foot Traffic</span>
 
                             <select
-                              className="k"
+                              className="v"
                               name="footTraffic"
                               id="footTraffic"
                               value={draft?.footTraffic ?? selected?.footTraffic ?? ""}
@@ -406,7 +624,7 @@ const filteredLeads = leads
                         <div className="kv">
                           <span className="k">Operating Hours</span>
                             <select
-                              className="k"
+                              className="v"
                               name="opH"
                               id="opH"
                               value={draft?.operatingHours ?? selected?.operatingHours ?? ""}
@@ -414,32 +632,33 @@ const filteredLeads = leads
                                 setDraft((o) => ({ ...o, operatingHours: e.target.value }))
                               }
                             >
-                              <option value="">Select Operating hours</option>
+                              <option value="">Select operating hours</option>
                               <option value="Daytime only">Daytime only</option>
                               <option value="After-hours">After-Hours</option>
-                              <option value="24/7 facilites service">24/7 facilites service</option>
+                              <option value="24/7 facilities service">24/7 facilities service</option>
                             </select>
                         </div>
                         <div className="kv">
-                          <span className="k">Pricing Model</span>
-                           <select
-                              className="k"
-                              name="opH"
-                              id="opH"
-                              value={draft?.pricingModel ?? selected?.pricingModel ?? ""}
+	                          <span className="k">Pricing Model</span>
+	                           <select
+	                              className={`v${leadErrors.pricingModel ? " invalid" : ""}`}
+	                              name="opH"
+	                              id="opH"
+	                              value={draft?.pricingModel ?? selected?.pricingModel ?? ""}
                               onChange={(e) =>
                                 setDraft((P) => ({ ...P, pricingModel: e.target.value }))
                               }
                             >
-                              <option value="">Select Operating hours</option>
+                              <option value="">Select pricing model</option>
                               <option value="Per square foot pricing">Per square foot pricing</option>
                               <option value="Hourly rates">Hourly rates</option>
-                              <option value="Flat monthly contract">Flat monthly contract</option>
-                            </select>
-                        </div>
+	                              <option value="Flat monthly contract">Flat monthly contract</option>
+	                            </select>
+                          {leadErrors.pricingModel && <span className="field-help error">{leadErrors.pricingModel}</span>}
+	                        </div>
 
                         <div className="kv">
-                          <span className="k">Visits (over peirod)</span>
+                          <span className="k">Visits (over period)</span>
                         <input
                           className="v"
                           value={draft?.freqCount ?? selected?.freqCount ?? ""}
@@ -453,9 +672,9 @@ const filteredLeads = leads
                           <span className="k">Hours / Visit</span>
                           <input
                             className="v"
-                            value={draft?.freqCount ?? selected?.freqCount ?? ""}
+                            value={draft?.freqTimesPerDay ?? selected?.freqTimesPerDay ?? ""}
                             onChange={(e) =>
-                              setDraft((d) => ({ ...d, freqCount: Number(e.target.value) }))
+                              setDraft((d) => ({ ...d, freqTimesPerDay: Number(e.target.value) }))
                             }
 
                           />                        
@@ -465,7 +684,7 @@ const filteredLeads = leads
                         <div className="kv">
                           <span className="k">Quality Expectations</span>
                            <select
-                              className="k"
+                              className="v"
                               name="qe"
                               id="qe"
                               value={draft?.qualityExpectations ?? selected?.qualityExpectations ?? ""}
@@ -473,17 +692,17 @@ const filteredLeads = leads
                                 setDraft((q) => ({ ...q, qualityExpectations: e.target.value }))
                               }
                             >
-                              <option value="">Select current Operating</option>
-                              <option value="Well maintained">Well maintained</option>
-                              <option value="Moderately Soiled">Moderately Soiled</option>
-                              <option value="Overdue deep clean">Overdue deep clean</option>
+                              <option value="">Select quality level</option>
+                              <option value="Spotless/disinfected - ideal for medical and client-facing spaces">Spotless/disinfected - ideal for medical and client-facing spaces</option>
+                              <option value="Tidy/maintained - practical standard for offices and warehouses">Tidy/maintained - practical standard for offices and warehouses</option>
+                              <option value="Detail-focused finish - high-touch zones plus visual polish">Detail-focused finish - high-touch zones plus visual polish</option>
                             </select>
                         </div>
                         
                         <div className="kv">
-                          <span className="k">Current</span>
+                          <span className="k">Current Problem</span>
                         <select
-                              className="kv"
+                              className="v"
                               name="cc"
                               id="cc"
                               value={draft?.currentCond ?? selected?.currentCond ?? ""}
@@ -492,31 +711,27 @@ const filteredLeads = leads
                               }
                             >
                               <option value="">Select current problem</option>
-                              <option value="Soil">soil</option>
+                              <option value="Soil">Soil</option>
                               <option value="Grease">Grease</option>
                               <option value="Dust">Dust</option>
-                            </select>
-                        </div>
-                        
-
-
+	                            </select>
+	                        </div>
+	                        
+	                      </section>
 <div className="divider" />
 
-                      </section>
-<div className="divider" />
-
-<section className="chips-block">
+<section className="chips-block modal-panel">
   {/* ---------- Shared Spaces ---------- */}
   <h4>Shared Spaces</h4>
   <div className="chips">
-    {(selected.sharedSpaces || []).map((s, idx) => (
+    {(draft?.sharedSpaces || []).map((s, idx) => (
       <div className="chip" key={idx}>
         <span>{s}</span>
         <button
           className="button"
           type="button"
           onClick={() => {
-            setSelected(prev => ({
+            setDraft(prev => ({
               ...prev,
               sharedSpaces: (prev.sharedSpaces || []).filter((_, i) => i !== idx),
             }));
@@ -555,7 +770,7 @@ const filteredLeads = leads
           const value = draft?.sharedSpaceToAdd;
           if (!value) return;
 
-          setSelected(prev => ({
+          setDraft(prev => ({
             ...prev,
             sharedSpaces: (prev.sharedSpaces || []).includes(value)
               ? prev.sharedSpaces
@@ -573,14 +788,14 @@ const filteredLeads = leads
   {/* ---------- Add-ons ---------- */}
   <h4>Add-ons</h4>
   <div className="chips">
-    {(selected.addOns || []).map((a, idx) => (
+    {(draft?.addOns || []).map((a, idx) => (
       <div className="chip" key={idx}>
         <span>{a}</span>
         <button
           className="button"
           type="button"
           onClick={() => {
-            setSelected(prev => ({
+            setDraft(prev => ({
               ...prev,
               addOns: (prev.addOns || []).filter((_, i) => i !== idx),
             }));
@@ -603,6 +818,7 @@ const filteredLeads = leads
         }
       >
         <option value="">Add Add-on</option>
+        <option value="Glass Cleaning">Glass Cleaning</option>
         <option value="Move-In/Move-Out Cleaning">Move-In/Move-Out Cleaning</option>
         <option value="Carpet & upholstery extraction">
           Carpet & upholstery extraction
@@ -616,7 +832,7 @@ const filteredLeads = leads
         <option value="Post-Construction Cleaning">
           Post-Construction Cleaning
         </option>
-        <option value="No add-On">No add-On</option>
+        <option value="No add-on">No add-on</option>
       </select>
 
       <button
@@ -626,7 +842,7 @@ const filteredLeads = leads
           const value = draft?.addOnToAdd;
           if (!value) return;
 
-          setSelected(prev => ({
+          setDraft(prev => ({
             ...prev,
             addOns: (prev.addOns || []).includes(value)
               ? prev.addOns
@@ -644,14 +860,14 @@ const filteredLeads = leads
   {/* ---------- Special Requests ---------- */}
   <h4>Special Requests</h4>
   <div className="chips">
-    {(selected.specialRequests || []).map((r, idx) => (
+    {(draft?.specialRequests || []).map((r, idx) => (
       <div className="chip" key={idx}>
         <span>{r}</span>
         <button
           className="button"
           type="button"
           onClick={() => {
-            setSelected(prev => ({
+            setDraft(prev => ({
               ...prev,
               specialRequests: (prev.specialRequests || []).filter((_, i) => i !== idx),
             }));
@@ -686,7 +902,7 @@ const filteredLeads = leads
           const value = draft?.specialRequestToAdd;
           if (!value) return;
 
-          setSelected(prev => ({
+          setDraft(prev => ({
             ...prev,
             specialRequests: (prev.specialRequests || []).includes(value)
               ? prev.specialRequests
@@ -698,58 +914,61 @@ const filteredLeads = leads
       >
         +
       </button>
-    </div>
-  </div>
+	    </div>
+	  </div>
 </section>
-                        <section className="billing-box">
-  <h4>Billing & Cleaning Schedule</h4>
+              </>
+            )}
+            {activeLeadTab === "billing" && (
+              <>
+	                        <section className="billing-box modal-panel">
+	  <h4>Billing & Cleaning Schedule</h4>
 
-  <div className="kv-grid">
+	  <div className="kv-grid billing-grid">
 
-    {/* Type of Cleaning */}
-    <div className="kv">
-      <span className="k">Type of Cleaning</span>
-      <select
-        className="k"
-        value={draft?.cleaningType ?? selected?.cleaningType ?? ""}
-        onChange={(e) =>
-          setDraft(d => ({ ...d, cleaningType: e.target.value }))
+    {/* Invoice Type */}
+	    <div className="kv">
+	      <span className="k">Invoice Type</span>
+	      <select
+	        className={`v${leadErrors.servicePackage ? " invalid" : ""}`}
+	        value={draft?.servicePackage ?? selected?.servicePackage ?? "Basic"}
+	        onChange={(e) =>
+	          setDraft(d => ({ ...d, servicePackage: e.target.value }))
         }
       >
-        <option value="">Select type</option>
-        <option value="Recurring Cleaning">Recurring Cleaning</option>
-        <option value="Deep Clean">Deep Clean</option>
-        <option value="One-Time Cleaning">One-Time Cleaning</option>
-       
-      </select>
-    </div>
+	        <option value="Basic">Package - Basic</option>
+	        <option value="Premium">Package - Premium</option>
+	      </select>
+        {leadErrors.servicePackage && <span className="field-help error">{leadErrors.servicePackage}</span>}
+	    </div>
 
     {/* Invoice Frequency */}
-    <div className="kv">
-      <span className="k">Invoice Frequency</span>
-      <select
-        className="k"
-        value={draft?.invoiceFrequency ?? selected?.invoiceFrequency ?? ""}
-        onChange={(e) =>
-          setDraft(d => ({ ...d, invoiceFrequency: e.target.value }))
+	    <div className="kv">
+	      <span className="k">Invoice Frequency</span>
+	      <select
+	        className={`v${leadErrors.invoiceFrequency ? " invalid" : ""}`}
+	        value={draft?.invoiceFrequency ?? selected?.invoiceFrequency ?? ""}
+	        onChange={(e) =>
+	          setDraft(d => ({ ...d, invoiceFrequency: e.target.value }))
         }
       >
         <option value="">Select frequency</option>
         <option value="weekly">Weekly</option>
         <option value="bi-weekly">Bi-Weekly</option>
-        <option value="monthly">Monthly</option>
-        <option value="one-time">One-Time</option>
-      </select>
-    </div>
+	        <option value="monthly">Monthly</option>
+	        <option value="one-time">One-Time</option>
+	      </select>
+        {leadErrors.invoiceFrequency && <span className="field-help error">{leadErrors.invoiceFrequency}</span>}
+	    </div>
 
     {/* Invoice Day */}
-    <div className="kv">
-      <span className="k">Invoice Day</span>
-      <select
-        className="k"
-        value={draft?.invoiceDay ?? selected?.invoiceDay ?? ""}
-        onChange={(e) =>
-          setDraft(d => ({ ...d, invoiceDay: e.target.value }))
+	    <div className="kv">
+	      <span className="k">Invoice Day</span>
+	      <select
+	        className={`v${leadErrors.invoiceDay ? " invalid" : ""}`}
+	        value={draft?.invoiceDay ?? selected?.invoiceDay ?? ""}
+	        onChange={(e) =>
+	          setDraft(d => ({ ...d, invoiceDay: e.target.value }))
         }
       >
         <option value="">Auto / End of period</option>
@@ -758,52 +977,64 @@ const filteredLeads = leads
         <option value="wednesday">Wednesday</option>
         <option value="thursday">Thursday</option>
         <option value="friday">Friday</option>
-        <option value="Saturday">Saturday</option>
-        <option value="Sunday">Sunday</option>
-      </select>
-    </div>
+	        <option value="saturday">Saturday</option>
+	        <option value="sunday">Sunday</option>
+	      </select>
+        {leadErrors.invoiceDay && <span className="field-help error">{leadErrors.invoiceDay}</span>}
+	    </div>
 
-  </div>
+	  </div>
 </section>
+              </>
+            )}
 
-            {/* IMPORTANT: keep tag nesting correct and close every <section> you open */}
+	            <div className="divider" />
 
-            <div className="divider" />
-
-            {/* 🔻 ACTION BUTTONS */}
+            {/* Action buttons */}
             <div className="modal-footer">
               <button className="btn danger" onClick={deleteLead}>
                 Delete Lead
               </button>
 
-              <button
-                className="btn primary"
-                onClick={async () => {
-                  try {
-                    const payload = {
-                      referralCode: selected.referralCode,
+	              <button
+	                className="btn primary"
+	                onClick={async () => {
+                  const errors = validateLeadDraft(draft);
+                  if (Object.keys(errors).length > 0) {
+                    if (errors.email || errors.business_name || errors.Ownername) setActiveLeadTab("client");
+                    else if (errors.frequency || errors.pricingModel) setActiveLeadTab("service");
+                    else setActiveLeadTab("billing");
+                    setModalNotice("Please fix required fields before saving.");
+                    return;
+                  }
+                  setModalNotice("");
+	                  try {
+	                    const payload = buildLeadPayload({
+	                      referralCode: selected.referralCode,
                       ...draft,
-                    };
+                    });
 
+                    await apiPut(`/leads/${selected.referralCode}`, payload, {
+                      auth: true,
+                    });
 
-                    const res = await fetch(
-                      `${API_URL}/leads/${selected.referralCode}`,
-                      {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(payload),
-                      }
-                    );
+                    const normalizedSaved = normalizeLeadDraft(payload);
+	                    setSelected((prev) => ({
+	                      ...(prev || {}),
+	                      ...normalizedSaved,
+	                    }));
+	                    setDraft(normalizedSaved);
+                      setOriginalDraft(normalizedSaved);
+	                    setViewInfo(false);
 
-                    if (!res.ok) throw new Error("Failed to save lead");
-
-                    setSelected(payload);
-                    setDraft(payload);
-                    setViewInfo(false);
-
-                    alert("Lead updated successfully");
-                  } catch (err) {
-                    alert(err.message);
+	                    setNotice("Lead updated successfully.");
+	                  } catch (err) {
+                    if (err instanceof ApiError && err.status === 401) {
+                      localStorage.removeItem("token");
+                      navigate("/login", { replace: true });
+                      return;
+                    }
+                    setNotice(err.message || "Failed to update lead");
                   }
                 }}
               >
@@ -818,3 +1049,7 @@ const filteredLeads = leads
 );
 
 }
+
+
+
+

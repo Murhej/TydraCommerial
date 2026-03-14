@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Header from "../../header/HeaderPage";
-import {API_URL} from "../../../config"
+import { ApiError, apiPost } from "../../../lib/apiClient";
+import usePageMeta from "../../../hooks/usePageMeta";
 import emailjs from "@emailjs/browser";
 import "./ContactInfo.css";
 
@@ -15,6 +16,7 @@ import Tiktok from "../../Img/Tiktok.svg";
 
 
 export default function ContactInfo() {
+  usePageMeta("Contact Us", "Contact Tydra for a fast commercial cleaning quote.");
   const [formData, setFormData] = useState({
     name: "",
     business_name: "",
@@ -43,7 +45,7 @@ export default function ContactInfo() {
     if (!formData.name.trim()) e.name = "Please enter your name.";
     if (!/^\S+@\S+\.\S+$/.test(formData.email)) e.email = "Enter a valid email.";
     if (!formData.message.trim()) e.message = "Tell us a bit about the job.";
-    if (formData.phone && !/^[0-9\-\+\s\(\)]{7,}$/.test(formData.phone)) {
+    if (formData.phone && !/^[0-9+\s()-]{7,}$/.test(formData.phone)) {
       e.phone = "Use numbers and ()-+ only.";
     }
 
@@ -61,18 +63,23 @@ export default function ContactInfo() {
       setStatus({ type: "err", text: "Please fix the highlighted fields." });
       return;
     }
-    await fetch(`${API_URL}/save_contact`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    try {
+      await apiPost("/save_contact", {
         referral: formData.referral_code,
         name: formData.name,
         business_name: formData.business_name,
         email: formData.email,
         phone: formData.phone,
         message: formData.message
-      })
-    });
+      });
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setStatus({ type: "err", text: err.message || "Unable to save your details right now." });
+        return;
+      }
+      setStatus({ type: "err", text: "Unable to save your details right now." });
+      return;
+    }
 
     setIsSending(true);
     try {
@@ -88,7 +95,7 @@ export default function ContactInfo() {
         business_name: "",
         email: "",
         phone: "",
-        referralCode: "",
+        referral_code: "",
         message: "",
         bot_field: ""
       });
@@ -125,9 +132,9 @@ export default function ContactInfo() {
 
           {/* Quick actions + referral jump */}
           <ul className="services__highlights">
-            <li><button type="button" className="chip chip--button" onClick={scrollToReferral}>🏷️ I have a referral code</button></li>
-            <li><a className="chip" href="tel:16478773741">📞 Call</a></li>
-            <li><a className="chip" href="mailto:tydra.gta.cleaning@gmail.com">✉️ Email</a></li>
+            <li><button type="button" className="chip chip--button ui-btn ghost sm" onClick={scrollToReferral}>I have a referral code</button></li>
+            <li><a className="chip" href="tel:16478773741">Call now</a></li>
+            <li><a className="chip" href="mailto:tydra.gta.cleaning@gmail.com">Email us</a></li>
           </ul>
 
           {/* Step chips for polish */}
@@ -143,11 +150,11 @@ export default function ContactInfo() {
           <header className="contact-header">
             <h2>Toronto, ON</h2>
             <p className="contact-meta">
-              <a href="tel:16478773741">(647) 877-3741</a> ·{" "}
+              <a href="tel:16478773741">(647) 877-3741</a> |{" "}
               <a href="mailto:tydra.gta.cleaning@gmail.com">tydra.gta.cleaning@gmail.com</a>
             </p>
             <div className="hours" aria-label="Business hours">
-              <span>Mon–Fri: 9am–6pm</span><span>Sat: 10am–6pm</span><span>Sun: Closed</span>
+              <span>Mon-Fri: 9am-6pm</span><span>Sat: 10am-6pm</span><span>Sun: Closed</span>
             </div>
           </header>
 
@@ -201,14 +208,14 @@ export default function ContactInfo() {
                 />
                 {errors.email
                   ? <span id="email-err" className="field__error">{errors.email}</span>
-                  : <span id="email-hint" className="field__hint">We’ll only use this to reply.</span>}
+                  : <span id="email-hint" className="field__hint">We will only use this to reply.</span>}
               </div>
 
               <div className="field">
                 <label htmlFor="phone">Phone</label>
                 <input
                   id="phone" name="phone" type="tel" inputMode="tel"
-                  pattern="^[0-9\\-\\+\\s\\(\\)]*$" placeholder="Optional"
+                  pattern="^[0-9+\\s()-]*$" placeholder="Optional"
                   value={formData.phone} onChange={handleChange}
                   autoComplete="tel" aria-invalid={!!errors.phone}
                   aria-describedby={errors.phone ? "phone-err" : undefined}
@@ -249,9 +256,9 @@ export default function ContactInfo() {
             </div>
 
             <div className="actions">
-              <button type="submit" className="btn" disabled={isSending}>
+              <button type="submit" className="btn ui-btn primary lg" disabled={isSending}>
                 {isSending ? <span className="spinner" aria-hidden /> : null}
-                {isSending ? "Sending…" : "Send Message"}
+                {isSending ? "Sending..." : "Send Message"}
               </button>
             </div>
 
@@ -276,8 +283,8 @@ export default function ContactInfo() {
                 {/* Business Hours */}
                 <div className="footer__column">
                   <h3 className="footer__header">Business Hours</h3>
-                  <p>Mon–Fri: 9 am–6 pm</p>
-                  <p>Sat: 10 am–6 pm</p>
+                  <p>Mon-Fri: 9 am-6 pm</p>
+                  <p>Sat: 10 am-6 pm</p>
                   <p>Sun: Closed</p>
                 </div>
       
@@ -326,3 +333,4 @@ export default function ContactInfo() {
     </section>
   );
 }
+

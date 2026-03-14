@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../../config";
+import { ApiError, apiGet, apiPost, apiPut, getAuthToken } from "../../lib/apiClient";
+import usePageMeta from "../../hooks/usePageMeta";
 import Header from "./header";
 import "./settings.css";
 
@@ -42,8 +44,9 @@ function saveLocalSettings(payload) {
 }
 
 export default function Settings() {
+  usePageMeta("Settings", "Manage account, company preferences, and security.");
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+  const token = getAuthToken();
 
   const [activeTab, setActiveTab] = useState("account");
   const [loading, setLoading] = useState(true);
@@ -82,15 +85,15 @@ export default function Settings() {
       setSettings(loadLocalSettings());
 
       try {
-        const res = await fetch(`${API_URL}/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.error || "Failed to load profile");
-
+        const data = await apiGet("/profile", { auth: true });
         setProfile(data);
         setStatus({ type: "ok", message: "Settings loaded." });
       } catch (err) {
+        if (err instanceof ApiError && err.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/login", { replace: true });
+          return;
+        }
         setProfile(null);
         setStatus({ type: "err", message: err.message || "Load failed" });
       } finally {
@@ -122,21 +125,16 @@ export default function Settings() {
     // 2) save profile (account tab fields)
     try {
       if (profile) {
-        const res = await fetch(`${API_URL}/profile`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(profile),
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.error || "Failed to save profile");
+        await apiPut("/profile", profile, { auth: true });
       }
 
       setStatus({ type: "ok", message: "Saved successfully." });
     } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/login", { replace: true });
+        return;
+      }
       setStatus({
         type: "warn",
         message:
@@ -160,18 +158,16 @@ export default function Settings() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await fetch(`${API_URL}/profile/avatar`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "Avatar upload failed");
+      const data = await apiPost("/profile/avatar", formData, { auth: true });
 
       setProfile((p) => ({ ...p, avatar: data.avatar }));
-      setStatus({ type: "ok", message: "✅ Profile picture updated" });
+      setStatus({ type: "ok", message: "Profile picture updated" });
     } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/login", { replace: true });
+        return;
+      }
       setStatus({ type: "err", message: err.message || "Upload failed" });
     }
   };
@@ -195,30 +191,30 @@ export default function Settings() {
       return;
     }
 
-    // If you don’t have this endpoint yet, it will show a warning.
+    // If backend validation fails, show the server error.
     try {
-      const res = await fetch(`${API_URL}/change_password`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
+      await apiPost(
+        "/change_password",
+        {
           current_password: pw.current_password,
           new_password: pw.new_password,
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "Password change failed");
+        },
+        {
+          auth: true,
+        }
+      );
 
       setPw({ current_password: "", new_password: "", confirm_new_password: "" });
       setStatus({ type: "ok", message: "Password updated." });
     } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/login", { replace: true });
+        return;
+      }
       setStatus({
         type: "warn",
-        message:
-          "Password endpoint not available yet. Add POST /change_password in backend.",
+        message: err.message || "Password change failed",
       });
     }
   };
@@ -556,7 +552,7 @@ export default function Settings() {
                       Last saved:{" "}
                       {settings.lastSavedAt
                         ? new Date(settings.lastSavedAt).toLocaleString()
-                        : "—"}
+                        : "-"}
                     </small>
                   </div>
                 </>
@@ -568,3 +564,4 @@ export default function Settings() {
     </>
   );
 }
+

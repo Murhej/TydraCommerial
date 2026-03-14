@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { API_URL } from "../../config"; // adjust path if needed
+import { ApiError, apiPost } from "../../lib/apiClient";
+import { InlineNotice } from "../../components/ui/PageStates";
 
 import "./QuoteForm.css";
 
@@ -10,7 +11,7 @@ export default function QuoteForm({ innerRef }) {
   const [sqft, setSqft] = useState("");
   const [selectedIndustry, setSelectedIndustry] = useState("");
 
-  // Step answers (category → answer)
+  // Step answers (category -> answer)
   const [footTrafficAnswers, setFootTrafficAnswers] = useState({});
   const [cleaningAnswers, setCleaningAnswers] = useState({});
   const [conditionAnswers, setConditionAnswers] = useState({});
@@ -18,6 +19,10 @@ export default function QuoteForm({ innerRef }) {
   const [serviceAddOns, setServiceAddOns] = useState([]);
   const [qualityExpectations, setQualityExpectations] = useState("");
   const [specialRequests, setSpecialRequests] = useState([]);
+  const [stepError, setStepError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitTone, setSubmitTone] = useState("info");
+  const [submitMessage, setSubmitMessage] = useState("");
 
   // Frequency helpers
   const [freqCount, setFreqCount] = useState("");
@@ -30,7 +35,7 @@ export default function QuoteForm({ innerRef }) {
   const [step4Ready, setStep4Ready] = useState(false); // Conditions
   const [step5Ready, setStep5Ready] = useState(false); // Pricing model
   const [step6Ready, setStep6Ready] = useState(false); // Service add-ons -> Quality
-  new Date().toISOString()
+  const [step7Ready, setStep7Ready] = useState(false); // Quality -> Summary
 
   // Referral code
   const [refCode, setRefCode] = useState("");
@@ -53,7 +58,12 @@ export default function QuoteForm({ innerRef }) {
     setStep4Ready(false);
     setStep5Ready(false);
     setStep6Ready(false);
+    setStep7Ready(false);
+    setStepError("");
     setRefCode("");
+    setIsSubmitting(false);
+    setSubmitTone("info");
+    setSubmitMessage("");
   };
 
   // -------------------------
@@ -90,9 +100,9 @@ export default function QuoteForm({ innerRef }) {
       "Shared restrooms or kitchens",
     ],
     "Foot traffic": [
-      "Light – small offices or limited staff",
-      "Moderate – regular staff & occasional visitors",
-      "Heavy – malls, schools, transit hubs, gyms",
+      "Light - small offices or limited staff",
+      "Moderate - regular staff and occasional visitors",
+      "Heavy - malls, schools, transit hubs, gyms",
     ],
     "Operating Hours": ["Daytime only", "After-hours", "24/7 facilities service"],
   };
@@ -114,18 +124,19 @@ export default function QuoteForm({ innerRef }) {
   const PricingModel = ["Per square foot pricing", "Hourly rates", "Flat monthly contract"];
 
   const ServiceAddOns = [
-
+    "Glass Cleaning",
     "Move-In/Move-Out Cleaning",
     "Carpet & upholstery extraction",
     "Eco-Friendly/Green Cleaning",
     "Kitchen/Breakroom Deep Cleaning",
     "Post-Construction Cleaning",
-    "No add-On",
+    "No add-on",
   ];
 
   const QualityOptions = [
-    "Spotless/disinfected – medical facilities",
-    "Tidy/maintained – warehouses, offices",
+    "Spotless/disinfected - ideal for medical and client-facing spaces",
+    "Tidy/maintained - practical standard for offices and warehouses",
+    "Detail-focused finish - high-touch zones plus visual polish",
   ];
 
   // -------------------------
@@ -155,9 +166,15 @@ export default function QuoteForm({ innerRef }) {
   // UI Helpers
   // -------------------------
   const handleAddOnChange = (item) => {
-    setServiceAddOns((prev) =>
-      prev.includes(item) ? prev.filter((v) => v !== item) : [...prev, item]
-    );
+    setStepError("");
+    setServiceAddOns((prev) => {
+      const isSelected = prev.includes(item);
+      const next = isSelected ? prev.filter((v) => v !== item) : [...prev, item];
+      if (item === "No add-on") {
+        return isSelected ? [] : ["No add-on"];
+      }
+      return next.filter((v) => v !== "No add-on");
+    });
   };
 
   const toggleSharedSpace = (item) => {
@@ -178,6 +195,66 @@ export default function QuoteForm({ innerRef }) {
     if (f === "Monthly") return "Times per month";
     return "";
   }, [cleaningAnswers]);
+
+  const totalSteps = 8;
+  const stepLabels = [
+    "Space",
+    "Traffic",
+    "Frequency",
+    "Condition",
+    "Pricing",
+    "Add-ons",
+    "Quality",
+    "Review",
+  ];
+  const currentStep = !step1Ready
+    ? 1
+    : !step2Ready
+    ? 2
+    : !step3Ready
+    ? 3
+    : !step4Ready
+    ? 4
+    : !step5Ready
+    ? 5
+    : !step6Ready
+    ? 6
+    : !step7Ready
+    ? 7
+    : 8;
+
+  const contextChips = useMemo(() => {
+    const chips = [];
+    if (selectedIndustry) chips.push(`Industry: ${selectedIndustry}`);
+    if (sqft) chips.push(`SqFt: ${sqft}`);
+    if (cleaningAnswers["Frequency"]) chips.push(`Frequency: ${cleaningAnswers["Frequency"]}`);
+    if (pricingModel) chips.push(`Pricing: ${pricingModel}`);
+    if (serviceAddOns.length > 0) chips.push(`Add-ons: ${serviceAddOns.length}`);
+    return chips;
+  }, [selectedIndustry, sqft, cleaningAnswers, pricingModel, serviceAddOns]);
+
+  const resetSpaceDetails = () => {
+    setSqft("");
+    setSelectedIndustry("");
+    setFootTrafficAnswers({});
+    setCleaningAnswers({});
+    setConditionAnswers({});
+    setPricingModel("");
+    setServiceAddOns([]);
+    setSpecialRequests([]);
+    setFreqCount("");
+    setFreqTimesPerDay("1");
+    setRefCode("");
+    setStep1Ready(false);
+    setStep2Ready(false);
+    setStep3Ready(false);
+    setStep4Ready(false);
+    setStep5Ready(false);
+    setStep6Ready(false);
+    setStep7Ready(false);
+    setQualityExpectations("");
+    setStepError("");
+  };
 
   // -------------------------
   // Referral Code Helpers
@@ -205,63 +282,65 @@ export default function QuoteForm({ innerRef }) {
   const copyRefCode = async () => {
     try {
       await navigator.clipboard.writeText(refCode);
-      alert("Referral code copied!");
+      setSubmitTone("success");
+      setSubmitMessage("Referral code copied to clipboard.");
     } catch {
-      alert("Could not copy code. Please copy it manually.");
+      setSubmitTone("error");
+      setSubmitMessage("Could not copy code. Please copy it manually.");
     }
   };
 
   const handleSubmitData = async () => {
- 
-  // Ensure a referral code exists
-  if (!refCode) {
-    alert("⚠️ Please generate your referral code first!");
-    return;
-  }
+    if (!refCode) {
+      setSubmitTone("error");
+      setSubmitMessage("Please generate your referral code first.");
+      return;
+    }
 
-  // Package data around referral code
-const payload = {
-  referralCode: refCode,
-  details: {
-    submittedAt: new Date().toISOString(), // 🔥 REQUIRED
-    sqft,
-    selectedIndustry,
-    footTrafficAnswers,
-    cleaningAnswers,
-    freqCount,
-    freqTimesPerDay,
-    specialRequests,
-    conditionAnswers,
-    pricingModel,
-    serviceAddOns,
-    qualityExpectations
-  }
-};
+    setIsSubmitting(true);
+    setSubmitMessage("");
 
+    const payload = {
+      referralCode: refCode,
+      details: {
+        submittedAt: new Date().toISOString(),
+        sqft,
+        selectedIndustry,
+        footTrafficAnswers,
+        cleaningAnswers,
+        freqCount,
+        freqTimesPerDay,
+        specialRequests,
+        conditionAnswers,
+        pricingModel,
+        serviceAddOns,
+        qualityExpectations
+      }
+    };
 
-try {
-  const res = await fetch(`${API_URL}/data`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    console.error("Server error:", data);
-    alert("❌ Error: " + (data.error || "Request failed"));
-    return;
-  }
-
-  alert("✅ Submission complete! Referral Code: " + payload.referralCode);
-
-} catch (err) {
-  console.error("Error sending data:", err);
-  alert("❌ Could not send data to backend. Try again, thank you 🙏");
-}
-
-};
+    try {
+      await apiPost("/data", payload);
+      setSubmitTone("success");
+      setSubmitMessage(`Submission complete. Referral Code: ${payload.referralCode}`);
+    } catch (err) {
+      console.error("Error sending data:", err);
+      if (err instanceof ApiError) {
+        const validationErrors = err?.payload?.validationErrors;
+        if (Array.isArray(validationErrors) && validationErrors.length > 0) {
+          setSubmitTone("error");
+          setSubmitMessage(`Please review your answers: ${validationErrors[0]}`);
+          return;
+        }
+        setSubmitTone("error");
+        setSubmitMessage(err.message || "Could not send data to backend. Please try again.");
+        return;
+      }
+      setSubmitTone("error");
+      setSubmitMessage("Could not send data to backend. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // -------------------------
   // RENDER
@@ -270,10 +349,38 @@ try {
     <form className="Quote" ref={innerRef} onSubmit={(e) => e.preventDefault()}>
       <div className="Quote-header">
         <h2>Get a Quote</h2>
-        <button type="button" onClick={resetForm} className="rest-button">
+        <button type="button" onClick={resetForm} className="rest-button ui-btn ghost sm">
           Reset
         </button>
       </div>
+      <div className="quote-progress" aria-label="Quote progress">
+        <div className="quote-progress__meta">
+          <span>Step {currentStep} of {totalSteps}</span>
+          <span>{Math.round((currentStep / totalSteps) * 100)}%</span>
+        </div>
+        <div className="quote-progress__track" role="progressbar" aria-valuemin={1} aria-valuemax={totalSteps} aria-valuenow={currentStep}>
+          <span style={{ width: `${(currentStep / totalSteps) * 100}%` }} />
+        </div>
+      </div>
+      <div className="quote-stepper" aria-label="Quote steps">
+        {stepLabels.map((label, idx) => {
+          const stepNum = idx + 1;
+          const state =
+            stepNum < currentStep ? "done" : stepNum === currentStep ? "active" : "todo";
+          return (
+            <span key={label} className={`quote-step-pill ${state}`}>
+              <strong>{stepNum}</strong> {label}
+            </span>
+          );
+        })}
+      </div>
+      {contextChips.length > 0 && (
+        <div className="quote-context" aria-label="Current selections">
+          {contextChips.map((chip) => (
+            <span key={chip} className="quote-context__chip">{chip}</span>
+          ))}
+        </div>
+      )}
 
       {/* Info Banner */}
       <div className="info-banner">
@@ -283,12 +390,12 @@ try {
             <li>Fill out the steps below and generate your code.</li>
             <li>
               Go to our{" "}
-              <a href="/contact" className="link">
+              <a href="/contactus" className="link">
                 Contact
               </a>{" "}
               page.
             </li>
-            <li>Paste your code in the “Referral / Promo Code” box and submit.</li>
+            <li>Paste your code in the "Referral / Promo Code" box and submit.</li>
           </ol>
         </div>
 
@@ -299,12 +406,12 @@ try {
               <input
                 type="text"
                 readOnly
-                value={refCode || "— no code yet —"}
+                value={refCode || "-- no code yet --"}
                 className="refcode-input"
               />
               <button
                 type="button"
-                className="btn-ghost"
+                className="btn-ghost ui-btn ghost sm"
                 onClick={() => (refCode ? copyRefCode() : generateRefCode())}
               >
                 {refCode ? "Copy" : "Generate"}
@@ -326,47 +433,71 @@ try {
               min={0}
               placeholder="Enter SqFt"
               value={sqft}
-              onChange={(e) => setSqft(e.target.value)}
+              onChange={(e) => {
+                setSqft(e.target.value);
+                setStepError("");
+              }}
             />
 
-            {!selectedIndustry && (
-              <div className="radio-selections">
-                {Object.keys(industryDetails).map((industry, index) => (
-                  <div className="radio-option" key={industry}>
-                    <input
-                      type="radio"
-                      id={`industry-${index}`}
-                      name="industry"
-                      value={industry}
-                      onChange={(e) => {
-                        setSelectedIndustry(e.target.value);
-                        setStep1Ready(false);
-                        setStep2Ready(false);
-                        setStep3Ready(false);
-                        setStep4Ready(false);
-                        setStep5Ready(false);
-                        setStep6Ready(false);
-                        setQualityExpectations("");
-                      }}
-                    />
-                    <label className="list-naem" htmlFor={`industry-${index}`}>
-                      {industry}
-                    </label>
-                  </div>
-                ))}
-              </div>
+            <div className="radio-selections">
+              {Object.keys(industryDetails).map((industry, index) => (
+                <div className="radio-option" key={industry}>
+                  <input
+                    type="radio"
+                    id={`industry-${index}`}
+                    name="industry"
+                    value={industry}
+                    checked={selectedIndustry === industry}
+                    onChange={(e) => {
+                      setSelectedIndustry(e.target.value);
+                      setStep1Ready(false);
+                      setStep2Ready(false);
+                      setStep3Ready(false);
+                      setStep4Ready(false);
+                      setStep5Ready(false);
+                      setStep6Ready(false);
+                      setStep7Ready(false);
+                      setQualityExpectations("");
+                      setStepError("");
+                    }}
+                  />
+                  <label className="list-naem" htmlFor={`industry-${index}`}>
+                    {industry}
+                  </label>
+                </div>
+              ))}
+            </div>
+            {selectedIndustry && (
+              <p className="selected-industry-note">
+                Selected: <strong>{selectedIndustry}</strong>
+              </p>
             )}
           </div>
 
-          <button
-            type="button"
-            className="next-button"
-            disabled={!step1Valid}
-            onClick={() => setStep1Ready(true)}
-            title={step1Valid ? "Continue" : "Select an industry"}
-          >
-            Next
-          </button>
+          <div className="step-actions">
+            <button
+              type="button"
+              className="back-button ui-btn secondary md"
+              onClick={resetSpaceDetails}
+            >
+              Reset Space Details
+            </button>
+            <button
+              type="button"
+              className="next-button ui-btn primary md"
+              onClick={() => {
+                if (!step1Valid) {
+                  setStepError("Please select your industry before continuing.");
+                  return;
+                }
+                setStepError("");
+                setStep1Ready(true);
+              }}
+            >
+              Next
+            </button>
+          </div>
+          {!step1Valid && stepError && <p className="step-error">{stepError}</p>}
         </div>
       )}
 
@@ -410,12 +541,13 @@ try {
                     id={`ft-${idx}`}
                     value={item}
                     checked={footTrafficAnswers["Foot traffic"] === item}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      setStepError("");
                       setFootTrafficAnswers((prev) => ({
                         ...prev,
                         "Foot traffic": e.target.value,
-                      }))
-                    }
+                      }));
+                    }}
                   />
                   <label className="list-naem" htmlFor={`ft-${idx}`}>
                     {item}
@@ -436,12 +568,13 @@ try {
                     id={`oh-${idx}`}
                     value={item}
                     checked={footTrafficAnswers["Operating Hours"] === item}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      setStepError("");
                       setFootTrafficAnswers((prev) => ({
                         ...prev,
                         "Operating Hours": e.target.value,
-                      }))
-                    }
+                      }));
+                    }}
                   />
                   <label className="list-naem" htmlFor={`oh-${idx}`}>
                     {item}
@@ -451,15 +584,33 @@ try {
             </ul>
           </div>
 
-          <button
-            type="button"
-            className="next-button"
-            disabled={!step2Valid}
-            onClick={() => setStep2Ready(true)}
-            title={step2Valid ? "Continue" : "Select foot traffic and operating hours"}
-          >
-            Next
-          </button>
+          <div className="step-actions">
+            <button
+              type="button"
+              className="back-button ui-btn secondary md"
+              onClick={() => {
+                setStepError("");
+                setStep1Ready(false);
+              }}
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              className="next-button ui-btn primary md"
+              onClick={() => {
+                if (!step2Valid) {
+                  setStepError("Please select foot traffic and operating hours to continue.");
+                  return;
+                }
+                setStepError("");
+                setStep2Ready(true);
+              }}
+            >
+              Next
+            </button>
+          </div>
+          {!step2Valid && stepError && <p className="step-error">{stepError}</p>}
         </div>
       )}
 
@@ -478,11 +629,12 @@ try {
                     id={`special-${i}`}
                     value={item}
                     checked={specialRequests.includes(item)}
-                    onChange={() =>
+                    onChange={() => {
+                      setStepError("");
                       setSpecialRequests((prev) =>
                         prev.includes(item) ? prev.filter((v) => v !== item) : [...prev, item]
-                      )
-                    }
+                      );
+                    }}
                   />
                   <label className="list-naem" htmlFor={`special-${i}`}>
                     {item}
@@ -504,6 +656,7 @@ try {
                     value={item}
                     checked={cleaningAnswers["Frequency"] === item}
                     onChange={(e) => {
+                      setStepError("");
                       setCleaningAnswers((prev) => ({ ...prev, Frequency: e.target.value }));
                       setFreqCount("");
                       setFreqTimesPerDay("1");
@@ -521,24 +674,25 @@ try {
               cleaningAnswers["Frequency"] || ""
             ) && (
               <div className="extra-inputs">
-               <div className="extra-inputs">
-  <div className="extra-field">
-    <label htmlFor="freq-count">
-      How many ({cleaningAnswers["Frequency"]})
-    </label>
-    <div className="inline-num fancy-input">
-      <input
-        id="freq-count"
-        type="number"
-        min={1}
-        placeholder="e.g., 5"
-        value={freqCount}
-        onChange={(e) => setFreqCount(e.target.value)}
-      />
-      <span className="suffix">/ times</span>
-    </div>
-  </div>
-</div>
+                <div className="extra-field">
+                  <label htmlFor="freq-count">
+                    How many ({cleaningAnswers["Frequency"]})
+                  </label>
+                  <div className="inline-num fancy-input">
+                    <input
+                      id="freq-count"
+                      type="number"
+                      min={1}
+                      placeholder="e.g., 5"
+                      value={freqCount}
+                      onChange={(e) => {
+                        setFreqCount(e.target.value);
+                        setStepError("");
+                      }}
+                    />
+                    <span className="suffix">/ times</span>
+                  </div>
+                </div>
 
 
                 {cleaningAnswers["Frequency"] === "Daily" && (
@@ -551,7 +705,10 @@ try {
                         min={1}
                         placeholder="e.g., 1"
                         value={freqTimesPerDay}
-                        onChange={(e) => setFreqTimesPerDay(e.target.value)}
+                        onChange={(e) => {
+                          setFreqTimesPerDay(e.target.value);
+                          setStepError("");
+                        }}
                       />
                       <span className="suffix">/ day</span>
                     </div>
@@ -561,15 +718,33 @@ try {
             )}
           </div>
 
-          <button
-            type="button"
-            className="next-button"
-            disabled={!cleaningInputsValid}
-            onClick={() => setStep3Ready(true)}
-            title={cleaningInputsValid ? "Continue" : "Complete frequency numbers"}
-          >
-            Next
-          </button>
+          <div className="step-actions">
+            <button
+              type="button"
+              className="back-button ui-btn secondary md"
+              onClick={() => {
+                setStepError("");
+                setStep2Ready(false);
+              }}
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              className="next-button ui-btn primary md"
+              onClick={() => {
+                if (!cleaningInputsValid) {
+                  setStepError("Please select frequency and complete required count fields.");
+                  return;
+                }
+                setStepError("");
+                setStep3Ready(true);
+              }}
+            >
+              Next
+            </button>
+          </div>
+          {!cleaningInputsValid && stepError && <p className="step-error">{stepError}</p>}
         </div>
       )}
 
@@ -589,12 +764,13 @@ try {
                       id={`condition-${idx}-${i}`}
                       value={item}
                       checked={conditionAnswers[category] === item}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        setStepError("");
                         setConditionAnswers((prev) => ({
                           ...prev,
                           [category]: e.target.value,
-                        }))
-                      }
+                        }));
+                      }}
                     />
                     <label className="list-naem" htmlFor={`condition-${idx}-${i}`}>
                       {item}
@@ -605,15 +781,33 @@ try {
             </div>
           ))}
 
-          <button
-            type="button"
-            className="next-button"
-            disabled={!step4Valid}
-            onClick={() => setStep4Ready(true)}
-            title={step4Valid ? "Continue" : "Answer all condition categories"}
-          >
-            Next
-          </button>
+          <div className="step-actions">
+            <button
+              type="button"
+              className="back-button ui-btn secondary md"
+              onClick={() => {
+                setStepError("");
+                setStep3Ready(false);
+              }}
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              className="next-button ui-btn primary md"
+              onClick={() => {
+                if (!step4Valid) {
+                  setStepError("Please answer all condition fields before continuing.");
+                  return;
+                }
+                setStepError("");
+                setStep4Ready(true);
+              }}
+            >
+              Next
+            </button>
+          </div>
+          {!step4Valid && stepError && <p className="step-error">{stepError}</p>}
         </div>
       )}
 
@@ -631,6 +825,7 @@ try {
                   value={item}
                   checked={pricingModel === item}
                   onChange={(e) => {
+                    setStepError("");
                     setPricingModel(e.target.value);
                     setStep5Ready(false);
                   }}
@@ -642,15 +837,33 @@ try {
             ))}
           </ul>
 
-          <button
-            type="button"
-            className="next-button"
-            disabled={!step5Valid}
-            onClick={() => setStep5Ready(true)}
-            title={step5Valid ? "Continue" : "Pick a pricing model"}
-          >
-            Next
-          </button>
+          <div className="step-actions">
+            <button
+              type="button"
+              className="back-button ui-btn secondary md"
+              onClick={() => {
+                setStepError("");
+                setStep4Ready(false);
+              }}
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              className="next-button ui-btn primary md"
+              onClick={() => {
+                if (!step5Valid) {
+                  setStepError("Please select a pricing model before continuing.");
+                  return;
+                }
+                setStepError("");
+                setStep5Ready(true);
+              }}
+            >
+              Next
+            </button>
+          </div>
+          {!step5Valid && stepError && <p className="step-error">{stepError}</p>}
         </div>
       )}
 
@@ -675,20 +888,38 @@ try {
             ))}
           </ul>
 
-          <button
-            type="button"
-            className="next-button"
-            disabled={!step6Valid}
-            onClick={() => setStep6Ready(true)}
-            title={step6Valid ? "Continue" : "Pick at least one add-on"}
-          >
-            Next
-          </button>
+          <div className="step-actions">
+            <button
+              type="button"
+              className="back-button ui-btn secondary md"
+              onClick={() => {
+                setStepError("");
+                setStep5Ready(false);
+              }}
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              className="next-button ui-btn primary md"
+              onClick={() => {
+                if (!step6Valid) {
+                  setStepError("Please choose at least one add-on (or 'No add-on').");
+                  return;
+                }
+                setStepError("");
+                setStep6Ready(true);
+              }}
+            >
+              Next
+            </button>
+          </div>
+          {!step6Valid && stepError && <p className="step-error">{stepError}</p>}
         </div>
       )}
 
       {/* ========== STEP 7: Quality Expectations ========== */}
-      {step6Ready && !qualityExpectations && (
+      {step6Ready && !step7Ready && (
         <div className="selected-message">
           <h3>Quality Expectations</h3>
           <ul>
@@ -700,7 +931,10 @@ try {
                   id={`quality-${i}`}
                   value={item}
                   checked={qualityExpectations === item}
-                  onChange={(e) => setQualityExpectations(e.target.value)}
+                  onChange={(e) => {
+                    setStepError("");
+                    setQualityExpectations(e.target.value);
+                  }}
                 />
                 <label className="list-naem" htmlFor={`quality-${i}`}>
                   {item}
@@ -708,35 +942,62 @@ try {
               </li>
             ))}
           </ul>
+          <div className="step-actions">
+            <button
+              type="button"
+              className="back-button ui-btn secondary md"
+              onClick={() => {
+                setStepError("");
+                setStep6Ready(false);
+              }}
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              className="next-button ui-btn primary md"
+              onClick={() => {
+                if (!qualityExpectations) {
+                  setStepError("Please select your quality expectation before continuing.");
+                  return;
+                }
+                setStepError("");
+                setStep7Ready(true);
+              }}
+            >
+              Next
+            </button>
+          </div>
+          {!qualityExpectations && stepError && <p className="step-error">{stepError}</p>}
         </div>
       )}
 
       {/* ========== STEP 8: Summary + Referral Code ========== */}
-      {qualityExpectations && (
+      {step7Ready && qualityExpectations && (
         <div className="selected-message summary">
           <h3>Summary of Your Selections</h3>
-          <p><strong>SqFt:</strong> {sqft || "—"}</p>
-          <p><strong>Industry:</strong> {selectedIndustry || "—"}</p>
+          <p><strong>SqFt:</strong> {sqft || "-"}</p>
+          <p><strong>Industry:</strong> {selectedIndustry || "-"}</p>
           <p>
             <strong>Foot Traffic:</strong>{" "}
-            {`Foot traffic: ${footTrafficAnswers["Foot traffic"] || "—"}; Operating Hours: ${
-              footTrafficAnswers["Operating Hours"] || "—"
+            {`Foot traffic: ${footTrafficAnswers["Foot traffic"] || "-"}; Operating Hours: ${
+              footTrafficAnswers["Operating Hours"] || "-"
             }; Shared: ${
               (footTrafficAnswers["Shared Spaces - (choose that apply)"] || []).join(", ") || "None"
             }`}
           </p>
           <p>
-            <strong>Cleaning Frequency:</strong> {cleaningAnswers["Frequency"] || "—"}
-            {freqCount ? ` · ${countLabel}: ${freqCount}` : ""}
+            <strong>Cleaning Frequency:</strong> {cleaningAnswers["Frequency"] || "-"}
+            {freqCount ? ` | ${countLabel}: ${freqCount}` : ""}
             {cleaningAnswers["Frequency"] === "Daily" && freqTimesPerDay
-              ? ` · Times/day: ${freqTimesPerDay}`
+              ? ` | Times/day: ${freqTimesPerDay}`
               : ""}
           </p>
           <p><strong>Special Requests:</strong> {specialRequests.length > 0 ? specialRequests.join(", ") : "None"}</p>
           <p><strong>Conditions:</strong> {Object.entries(conditionAnswers).map(([cat, ans]) => `${cat}: ${ans}`).join("; ")}</p>
-          <p><strong>Preferred Pricing Model:</strong> {pricingModel || "—"}</p>
+          <p><strong>Preferred Pricing Model:</strong> {pricingModel || "-"}</p>
           <p><strong>Service Add-ons:</strong> {serviceAddOns.join(", ") || "None"}</p>
-          <p><strong>Quality Expectations:</strong> {qualityExpectations || "—"}</p>
+          <p><strong>Quality Expectations:</strong> {qualityExpectations || "-"}</p>
 
           <div className="referral-card">
             <div className="referral-head">
@@ -749,12 +1010,12 @@ try {
                 type="text"
                 readOnly
                 value={refCode}
-                placeholder="No code yet"
+                placeholder="-- no code yet --"
                 className="refcode-input"
               />
               <button
                 type="button"
-                className="btn-ghost"
+                className="btn-ghost ui-btn ghost sm"
                 onClick={refCode ? copyRefCode : generateRefCode}
               >
                 {refCode ? "Copy" : "Generate"}
@@ -762,11 +1023,35 @@ try {
             </div>
           </div>
 
-          <a className="submit-cta" onClick={handleSubmitData} role="button">
-            Submit Request
-          </a>
+          <div className="step-actions">
+            <button
+              type="button"
+              className="back-button ui-btn secondary md"
+              onClick={() => {
+                setStepError("");
+                setStep7Ready(false);
+              }}
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              className="submit-cta"
+              onClick={handleSubmitData}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : "Submit Request"}
+            </button>
+          </div>
+          <InlineNotice tone={submitTone}>{submitMessage}</InlineNotice>
         </div>
       )}
     </form>
   );
 }
+
+
+
+
+
+

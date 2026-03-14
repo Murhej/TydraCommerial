@@ -1,89 +1,114 @@
 :root {
-  --header-h: 6rem; /* keep a single source of truth */
+  --header-h: 4.65rem;
+  --header-h-compact: 4.2rem;
 }
 
-/* Make page scrolling smooth (optional) */
 html { scroll-behavior: smooth; }
 
-/* ----------------------------------------
-   Fixed header always on top
-   ---------------------------------------- */
 .header-Body {
-  position: fixed;          /* <— fixed instead of sticky */
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: var(--header-h);
-  background-color: rgb(241, 238, 238);
+  background: rgba(255, 255, 255, 0.86);
+  border-bottom: 1px solid rgba(203, 213, 225, 0.9);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1rem;
+  padding: 0 1.35rem;
   z-index: 1000;
   box-sizing: border-box;
-  transition: box-shadow 0.25s ease, backdrop-filter 0.25s ease;
+  transition: box-shadow 0.25s ease, backdrop-filter 0.25s ease, height 0.2s ease, padding 0.2s ease;
 }
 
-/* Shadow appears only after you scroll a bit */
 .header-Body.scrolled {
-  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-  /* optional subtle glass effect if you like */
-  /* backdrop-filter: saturate(120%) blur(6px); */
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(10px);
 }
 
-/* Spacer to offset content so it doesn't slide under header */
+.header-Body.compact {
+  height: var(--header-h-compact);
+  padding: 0 1.15rem;
+}
+
 .header-spacer {
   height: var(--header-h);
 }
 
-/* Logo */
 .logo img {
-  height: clamp(4rem, 3.5rem + 1vw, 10rem);
+  width: auto;
+  height: clamp(32px, 2.4vw, 40px);
+  max-width: 170px;
+  object-fit: contain;
+  display: block;
   cursor: pointer;
+  transition: height 0.2s ease;
 }
 
-/* Nav row */
+.header-Body.compact .logo img {
+  height: clamp(30px, 2.2vw, 36px);
+}
+
 .avaters {
   display: flex;
-  gap: 3vw;
+  gap: clamp(0.8rem, 1.8vw, 2rem);
   align-items: center;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 544;
+  font-family: "Plus Jakarta Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 600;
 }
 
-/* nav links & button */
 .nav-item {
   text-decoration: none;
   color: inherit;
-  padding-bottom: 0.1rem;
-  transition: border-color 0.2s;
-}
-.nav-item:hover {
-  border-bottom: 2px solid #4fb0b3;
-}
-.contact-btn {
-  padding: 0.9rem 1.2rem;
-  border-radius: 15px;
-  background-color: #4fb0b3;
-  color: #000;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 549;
-  font-size: 15px;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-.contact-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+  padding-bottom: 0.2rem;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.2s, color 0.2s;
 }
 
-/* ----------------------------------------
-   Hamburger icon
-   ---------------------------------------- */
+.nav-item:hover {
+  border-bottom-color: #0ea5e9;
+  color: #0f2b46;
+}
+
+.nav-item:focus-visible,
+.contact-btn:focus-visible,
+.menu-toggle:focus-visible {
+  outline: 2px solid #0ea5e9;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.nav-item.active {
+  border-bottom-color: #2563eb;
+  color: #0f172a;
+}
+
+.contact-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 1.2rem;
+  border-radius: 15px;
+  font-family: "Plus Jakarta Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 15px;
+  border: 2px solid transparent;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.contact-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.contact-btn.active {
+  border-color: #2563eb;
+  box-shadow: 0 12px 22px rgba(37, 99, 235, 0.28);
+}
+
 .menu-toggle {
-  display: none;             /* show via media-query */
+  display: none;
   flex-direction: column;
   justify-content: space-between;
   width: 2rem;
@@ -92,31 +117,47 @@ html { scroll-behavior: smooth; }
   border: none;
   cursor: pointer;
   padding: 0;
-  z-index: 1001;            /* above the dropdown */
+  z-index: 1001;
 }
+
 .menu-toggle span {
   display: block;
   height: 3px;
-  background-color: #000;
+  background-color: #0f172a;
   border-radius: 2px;
   transition: all 0.3s ease;
 }
-/* X animation */
+
 .menu-toggle.open span:nth-child(1) {
   transform: rotate(45deg) translate(5px, 5px);
 }
+
 .menu-toggle.open span:nth-child(2) {
   opacity: 0;
 }
+
 .menu-toggle.open span:nth-child(3) {
   transform: rotate(-45deg) translate(5px, -5px);
 }
 
-/* ----------------------------------------
-   Desktop: show nav, hide burger
-   ---------------------------------------- */
-@media (min-width: 769px) {
-  .menu-toggle { display: none; }
+.menu-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  border: none;
+  background: rgba(2, 6, 23, 0.35);
+  z-index: 995;
+}
+
+.menu-overlay.show {
+  display: block;
+}
+
+@media (min-width: 981px) {
+  .menu-toggle {
+    display: none;
+  }
+
   .avaters {
     display: flex !important;
     position: static;
@@ -126,35 +167,111 @@ html { scroll-behavior: smooth; }
     max-height: none;
     overflow: visible;
   }
+
+  .menu-overlay {
+    display: none !important;
+  }
 }
 
-/* ----------------------------------------
-   Mobile/Tablet: dropdown under fixed header
-   ---------------------------------------- */
-@media (max-width: 768px) {
-  .menu-toggle { display: flex; }
+@media (max-width: 980px) {
+  :root {
+    --header-h: 4.35rem;
+    --header-h-compact: 4rem;
+  }
+
+  .header-Body {
+    padding: 0 0.85rem;
+  }
+
+  .logo img {
+    height: clamp(30px, 6vw, 34px);
+    max-width: 150px;
+  }
+
+  .menu-toggle {
+    display: flex;
+  }
 
   .avaters {
-    position: fixed;                 /* fixed so it sticks with header */
-    top: var(--header-h);            /* sit right below the header */
-    left: 0;
-    width: 100%;
-    background-color: rgb(241, 238, 238);
+    position: fixed;
+    top: calc(var(--header-h) + 0.3rem);
+    right: 0.8rem;
+    left: auto;
+    width: min(380px, calc(100vw - 1.6rem));
+    background: rgba(255, 255, 255, 0.98);
     flex-direction: column;
-    max-height: 0;                   /* collapsed */
+    max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease-in-out;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    z-index: 999;                    /* under header but above content */
+    border-radius: 14px;
+    border: 1px solid #dbe5f0;
+    box-shadow: 0 16px 32px rgba(2, 6, 23, 0.16);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
   }
+
+  .contact-btn {
+    min-height: 44px;
+  }
+
   .avaters.mobile-open {
-    max-height: 300px;               /* adjust based on items */
+    max-height: 360px;
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .nav-item,
   .contact-btn {
     width: 100%;
     text-align: center;
-    padding: 0.75rem 1rem;
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .nav-item.active {
+    background: rgba(37, 99, 235, 0.11);
+    border-bottom-color: transparent;
+  }
+
+  .contact-btn {
+    border-radius: 0 0 14px 14px;
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-Body {
+    padding: 0 0.72rem;
+  }
+
+  .avaters {
+    top: calc(var(--header-h) + 0.25rem);
+  }
+
+  .nav-item,
+  .contact-btn {
+    font-size: 0.92rem;
+    padding: 0.74rem 0.9rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .header-Body {
+    padding: 0 0.65rem;
+  }
+
+  .menu-toggle {
+    width: 1.7rem;
+    height: 1.25rem;
+  }
+
+  .menu-toggle span {
+    height: 2px;
+  }
+
+  .avaters {
+    right: 0.65rem;
+    width: calc(100vw - 1.3rem);
   }
 }

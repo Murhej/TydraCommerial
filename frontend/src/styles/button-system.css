@@ -1,0 +1,56 @@
+/* Shared public button layer */
+
+:where(.hero__button, .btn-primary, .btn-secondary, .btn-tertiary, .expand-btn, .sg-action-btn, .contact-section .btn, .contact-btn, .Quote .next-button, .Quote .back-button, .Quote .submit-cta, .Quote .btn-ghost, .Quote .rest-button) {
+  border-radius: 12px;
+  font-weight: 800;
+  font-family: inherit;
+  text-decoration: none;
+  transition: transform var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard),
+    background-color var(--duration-base) var(--ease-standard),
+    border-color var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard);
+}
+
+:where(.hero__button, .btn-primary, .expand-btn, .sg-action-btn.filled, .contact-section .btn, .Quote .next-button, .Quote button[type="submit"], .Quote .submit-cta) {
+  background: var(--gradient-primary);
+  border-color: #2563eb;
+  color: #fff;
+}
+
+:where(.hero__button.secondary, .btn-secondary, .sg-action-btn.outline, .Quote .back-button) {
+  background: #ffffff;
+  border-color: #cfe0ef;
+  color: #0f2b46;
+}
+
+:where(.btn-tertiary, .Quote .btn-ghost, .Quote .rest-button) {
+  background: #f8fbff;
+  border-color: #d7e7f5;
+  color: #1e3a8a;
+}
+
+:where(.hero__button, .btn-primary, .btn-secondary, .btn-tertiary, .expand-btn, .sg-action-btn, .contact-section .btn, .Quote .next-button, .Quote .back-button, .Quote .submit-cta, .Quote .btn-ghost, .Quote .rest-button):hover {
+  transform: translateY(-1px);
+}
+
+:where(.hero__button, .btn-primary, .expand-btn, .sg-action-btn.filled, .contact-section .btn, .Quote .next-button, .Quote button[type="submit"], .Quote .submit-cta):hover {
+  background: var(--gradient-primary-hover);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.28);
+}
+
+:where(.hero__button.secondary, .btn-secondary, .sg-action-btn.outline, .Quote .back-button):hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
+}
+
+:where(.btn-tertiary, .Quote .btn-ghost, .Quote .rest-button):hover {
+  background: #eef6ff;
+  border-color: #bfdbfe;
+}
+
+:where(.hero__button, .btn-primary, .btn-secondary, .btn-tertiary, .expand-btn, .sg-action-btn, .contact-section .btn, .Quote .next-button, .Quote .back-button, .Quote .submit-cta, .Quote .btn-ghost, .Quote .rest-button):focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.22);
+}
