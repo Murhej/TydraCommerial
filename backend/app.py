@@ -31,12 +31,27 @@ ALLOWED_AVATAR_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 USERNAME_RE = re.compile(r"^[a-z0-9_]{3,30}$")
 CURRENCY_WHITELIST = {"cad", "usd"}
-DEFAULT_ALLOWED_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"]
+DEFAULT_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://www.tydracleaning.com",
+    "https://tydracleaning.com",
+]
+
 _origins = (os.getenv("CORS_ORIGINS") or "").strip()
 ALLOWED_ORIGINS = (
     [o.strip() for o in _origins.split(",") if o.strip()]
     if _origins
     else DEFAULT_ALLOWED_ORIGINS
+)
+
+CORS(
+    app,
+    resources={r"/*": {"origins": ALLOWED_ORIGINS}},
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
+    supports_credentials=True,
+    max_age=600,
 )
 RATE_LIMIT_BUCKETS = {}
 RATE_LIMIT_LOGIN = (10, 60)  # 10 attempts / minute
