@@ -45,14 +45,6 @@ ALLOWED_ORIGINS = (
     else DEFAULT_ALLOWED_ORIGINS
 )
 
-CORS(
-    app,
-    resources={r"/*": {"origins": ALLOWED_ORIGINS}},
-    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization"],
-    supports_credentials=True,
-    max_age=600,
-)
 RATE_LIMIT_BUCKETS = {}
 RATE_LIMIT_LOGIN = (10, 60)  # 10 attempts / minute
 RATE_LIMIT_INVOICE = (20, 60)  # 20 requests / minute
@@ -71,9 +63,14 @@ app.config["MAX_CONTENT_LENGTH"] = MAX_AVATAR_BYTES
 serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 # ------------------ APP ------------------
 
+# ------------------ APP ------------------
+app = Flask(__name__)
+app.config["SECRET_KEY"] = APP_SECRET_KEY
+app.config["MAX_CONTENT_LENGTH"] = MAX_AVATAR_BYTES
+serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+
 if not APP_SECRET_KEY:
     raise RuntimeError("APP_SECRET_KEY is required")
-
 
 CORS(
     app,
@@ -82,7 +79,7 @@ CORS(
     allow_headers=["Content-Type", "Authorization"],
     max_age=600,
 )
-
+# ------------------ APP ------------------
 # ------------------ UPLOADS ------------------
 UPLOAD_FOLDER = "uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
