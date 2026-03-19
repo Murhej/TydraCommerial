@@ -164,6 +164,27 @@
   margin-top: 0.4rem;
 }
 
+.contact-section .draft-row {
+  margin-top: 0.72rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.contact-section .draft-pill {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #dbe5ef;
+  background: #f8fbff;
+  color: #475569;
+  border-radius: 999px;
+  padding: 0.28rem 0.64rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 .contact-section .contact-form {
   display: grid;
   gap: 0.9rem;
@@ -274,6 +295,7 @@
 .contact-section .btn[disabled] {
   filter: grayscale(0.2) brightness(0.95);
   cursor: not-allowed;
+  transform: none;
 }
 
 .contact-section .spinner {
@@ -372,6 +394,10 @@
 
   .contact-section .chip {
     width: 100%;
+  }
+
+  .contact-section .draft-row {
+    justify-content: flex-start;
   }
 }
 

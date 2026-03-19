@@ -14,6 +14,7 @@ import Facebook from "../../Img/icon-facebook.svg";
 import Instagram from "../../Img/icon-instagram.svg";
 import Tiktok from "../../Img/Tiktok.svg";
 
+const CONTACT_DRAFT_STORAGE_KEY = "tydra_contact_form_draft_v1";
 
 export default function ContactInfo() {
   usePageMeta("Contact Us", "Contact Tydra for a fast commercial cleaning quote.");
@@ -24,21 +25,102 @@ export default function ContactInfo() {
     phone: "",
     referral_code: "",
     message: "",
-  
+    bot_field: ""
   });
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState({ type: "", text: "" });
   const [isSending, setIsSending] = useState(false);
+  const [isDraftHydrated, setIsDraftHydrated] = useState(false);
+  const [draftSavedAt, setDraftSavedAt] = useState("");
 
   const formRef = useRef(null);
   const msgRef = useRef(null);
   const referralRef = useRef(null);
 
+  const sanitizeReferralCode = (value) =>
+    String(value || "")
+      .toUpperCase()
+      .replace(/[^A-Z0-9-]/g, "")
+      .slice(0, 64);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((p) => ({ ...p, [name]: value }));
+    const normalizedValue = name === "referral_code" ? sanitizeReferralCode(value) : value;
+    setFormData((p) => ({ ...p, [name]: normalizedValue }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
+
+  const clearContactDraft = () => {
+    if (typeof window === "undefined") return;
+    window.localStorage.removeItem(CONTACT_DRAFT_STORAGE_KEY);
+  };
+
+  const clearContactDraftOnly = () => {
+    clearContactDraft();
+    setDraftSavedAt("");
+    setStatus({ type: "ok", text: "Saved contact draft was cleared." });
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      setIsDraftHydrated(true);
+      return;
+    }
+    try {
+      const raw = window.localStorage.getItem(CONTACT_DRAFT_STORAGE_KEY);
+      if (!raw) {
+        setIsDraftHydrated(true);
+        return;
+      }
+      const draft = JSON.parse(raw);
+      if (!draft || typeof draft !== "object") {
+        setIsDraftHydrated(true);
+        return;
+      }
+      setFormData((prev) => ({
+        ...prev,
+        name: draft.name || "",
+        business_name: draft.business_name || "",
+        email: draft.email || "",
+        phone: draft.phone || "",
+        referral_code: draft.referral_code || "",
+        message: draft.message || "",
+      }));
+      setDraftSavedAt(draft.draftSavedAt || "");
+    } catch {
+      // ignore malformed drafts
+    } finally {
+      setIsDraftHydrated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isDraftHydrated || typeof window === "undefined") return;
+    const nowLabel = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const payload = {
+      name: formData.name,
+      business_name: formData.business_name,
+      email: formData.email,
+      phone: formData.phone,
+      referral_code: formData.referral_code,
+      message: formData.message,
+      draftSavedAt: nowLabel,
+    };
+    try {
+      window.localStorage.setItem(CONTACT_DRAFT_STORAGE_KEY, JSON.stringify(payload));
+      setDraftSavedAt(nowLabel);
+    } catch {
+      // ignore quota issues
+    }
+  }, [
+    isDraftHydrated,
+    formData.name,
+    formData.business_name,
+    formData.email,
+    formData.phone,
+    formData.referral_code,
+    formData.message,
+  ]);
 
   const validate = () => {
     const e = {};
@@ -51,6 +133,11 @@ export default function ContactInfo() {
 
     return e;
   };
+  const isFormReady =
+    !!formData.name.trim() &&
+    /^\S+@\S+\.\S+$/.test(formData.email) &&
+    !!formData.message.trim() &&
+    (!formData.phone || /^[0-9+\s()-]{7,}$/.test(formData.phone));
 
   const sendEmail = async (e) => {
     e.preventDefault();
@@ -99,6 +186,8 @@ export default function ContactInfo() {
         message: "",
         bot_field: ""
       });
+      clearContactDraft();
+      setDraftSavedAt("");
       formRef.current?.reset();
     } catch {
       setStatus({ type: "err", text: "Oops! Something went wrong. Please try again." });
@@ -155,6 +244,18 @@ export default function ContactInfo() {
             </p>
             <div className="hours" aria-label="Business hours">
               <span>Mon-Fri: 9am-6pm</span><span>Sat: 10am-6pm</span><span>Sun: Closed</span>
+            </div>
+            <div className="draft-row">
+              <span className="draft-pill">
+                {draftSavedAt ? `Draft saved ${draftSavedAt}` : "Draft autosave on"}
+              </span>
+              <button
+                type="button"
+                className="chip chip--button ui-btn ghost sm"
+                onClick={clearContactDraftOnly}
+              >
+                Clear Draft
+              </button>
             </div>
           </header>
 
@@ -256,7 +357,7 @@ export default function ContactInfo() {
             </div>
 
             <div className="actions">
-              <button type="submit" className="btn ui-btn primary lg" disabled={isSending}>
+              <button type="submit" className="btn ui-btn primary lg" disabled={isSending || !isFormReady}>
                 {isSending ? <span className="spinner" aria-hidden /> : null}
                 {isSending ? "Sending..." : "Send Message"}
               </button>
