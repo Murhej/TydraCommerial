@@ -12,8 +12,8 @@
   padding: 0 !important;
   margin: 0 !important;
   background:
-    radial-gradient(1000px 280px at 10% -20%, rgba(20, 184, 166, 0.12), transparent 60%),
-    radial-gradient(1000px 280px at 100% -20%, rgba(59, 130, 246, 0.1), transparent 60%),
+    radial-gradient(1000px 280px at 10% -20%, rgba(13, 148, 136, 0.12), transparent 60%),
+    radial-gradient(1000px 280px at 100% -20%, rgba(13, 148, 136, 0.07), transparent 60%),
     #f3f7fb;
 }
 
@@ -26,7 +26,7 @@
 }
 
 .todo-hero {
-  background: linear-gradient(140deg, #ffffff 0%, #f5fbff 100%);
+  background: linear-gradient(140deg, #ffffff 0%, #f0fdf9 100%);
   border: 1px solid var(--todo-border);
   border-radius: 18px;
   box-shadow: var(--todo-shadow);
@@ -38,7 +38,7 @@
 .todo-hero-copy h1 {
   margin: 0;
   font-size: clamp(1.35rem, 1.1rem + 0.9vw, 2rem);
-  color: #0f2b46;
+  color: var(--todo-ink, #0f172a);
 }
 
 .todo-hero-copy p {
@@ -114,14 +114,14 @@
 .todo-card-head .section-title {
   margin: 0;
   font-size: 1.2rem;
-  color: #0f2b46;
+  color: var(--todo-ink, #0f172a);
 }
 
 .todo-pill {
   border-radius: 999px;
   padding: 5px 10px;
-  background: #ecfeff;
-  border: 1px solid #a5f3fc;
+  background: #ccfbf1;
+  border: 1px solid rgba(13, 148, 136, 0.3);
   color: #0f766e;
   font-size: 0.78rem;
   font-weight: 800;
@@ -144,8 +144,8 @@
   grid-template-columns: 1.4fr 1.9fr 1.6fr 1fr 0.9fr;
   padding: 10px 12px;
   border-radius: 12px;
-  background: #f8fbff;
-  border: 1px solid #e2eaf4;
+  background: #f4fbf9;
+  border: 1px solid rgba(13, 148, 136, 0.15);
   font-size: 0.74rem;
   color: #64748b;
   text-transform: uppercase;

@@ -2,8 +2,8 @@
   min-height: 100vh;
   width: 100%;
   background:
-    radial-gradient(1000px 280px at 12% -20%, rgba(20, 184, 166, 0.1), transparent 60%),
-    radial-gradient(1000px 280px at 100% -20%, rgba(59, 130, 246, 0.08), transparent 60%),
+    radial-gradient(1000px 280px at 12% -20%, rgba(13, 148, 136, 0.1), transparent 60%),
+    radial-gradient(1000px 280px at 100% -20%, rgba(13, 148, 136, 0.06), transparent 60%),
     #f4f8fc;
   display: flex;
   flex-direction: column;
@@ -85,7 +85,7 @@
 .payment-empty h3 {
   margin: 0 0 8px;
   font-size: clamp(1.2rem, 1rem + 0.8vw, 1.8rem);
-  color: #0f2b46;
+  color: #0f172a;
 }
 
 .payment-empty p {
@@ -201,7 +201,7 @@
   height: 46px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(90deg, #16a34a, #059669);
+  background: linear-gradient(135deg, #0ea5e9 0%, #0d9488 100%);
   color: white;
   font-size: 0.98rem;
   font-weight: 800;
@@ -211,7 +211,7 @@
 
 .sendBtn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(5, 150, 105, 0.25);
+  box-shadow: 0 10px 24px rgba(13, 148, 136, 0.3);
 }
 
 .sendBtn:disabled {
@@ -242,9 +242,9 @@
 }
 
 .message-banner.info {
-  color: #1e3a8a;
-  background: #eff6ff;
-  border-color: #bfdbfe;
+  color: #0f766e;
+  background: #ccfbf1;
+  border-color: rgba(13, 148, 136, 0.3);
 }
 
 .fieldLabel {

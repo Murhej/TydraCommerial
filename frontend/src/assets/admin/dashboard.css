@@ -4,8 +4,9 @@
   --adm-ink: #0f172a;
   --adm-muted: #64748b;
   --adm-line: #dbe4ee;
-  --adm-brand: #0f766e;
+  --adm-brand: #0d9488;
   --adm-brand-soft: #ccfbf1;
+  --adm-brand-mid: #0f766e;
   --adm-danger: #dc2626;
   --adm-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
 }
@@ -14,8 +15,8 @@
   min-height: 100vh;
   width: 100%;
   background:
-    radial-gradient(1000px 280px at 10% -20%, rgba(20, 184, 166, 0.12), transparent 60%),
-    radial-gradient(1000px 280px at 100% -20%, rgba(59, 130, 246, 0.1), transparent 60%),
+    radial-gradient(1000px 280px at 10% -20%, rgba(13, 148, 136, 0.12), transparent 60%),
+    radial-gradient(1000px 280px at 100% -20%, rgba(13, 148, 136, 0.07), transparent 60%),
     var(--adm-bg);
   font-family: "Plus Jakarta Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: var(--adm-ink);
@@ -112,14 +113,14 @@
   margin: 0;
   font-size: 1.5rem;
   font-weight: 800;
-  color: #0f2b46;
+  color: var(--adm-ink, #0f172a);
 }
 
 .list-count {
   font-size: 0.82rem;
-  color: #1e40af;
-  background: #dbeafe;
-  border: 1px solid #bfdbfe;
+  color: var(--adm-brand-mid, #0f766e);
+  background: var(--adm-brand-soft, #ccfbf1);
+  border: 1px solid rgba(13, 148, 136, 0.25);
   border-radius: 999px;
   padding: 4px 10px;
 }
@@ -146,9 +147,9 @@
 }
 
 .dashboard-loading {
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  color: #1d4ed8;
+  background: var(--adm-brand-soft, #ccfbf1);
+  border: 1px solid rgba(13, 148, 136, 0.3);
+  color: var(--adm-brand-mid, #0f766e);
 }
 
 :root {
@@ -170,8 +171,8 @@
   position: sticky;
   top: 0;
   z-index: 2;
-  background: #f8fbff;
-  border-bottom: 2px solid #d5dfeb;
+  background: #f4fbf9;
+  border-bottom: 2px solid var(--adm-line, #dbe4ee);
   border-radius: 10px;
   color: #334155;
   font-weight: 700;
@@ -303,7 +304,7 @@
   margin: 0 0 2px;
   font-size: 1rem;
   font-weight: 800;
-  color: #0f2b46;
+  color: var(--adm-ink, #0f172a);
   letter-spacing: 0.01em;
 }
 
@@ -331,10 +332,10 @@
 }
 
 .lead-tab.active {
-  background: #0f766e;
+  background: var(--adm-brand, #0d9488);
   color: #ffffff;
-  border-color: #0f766e;
-  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.24);
+  border-color: var(--adm-brand, #0d9488);
+  box-shadow: 0 8px 18px rgba(13, 148, 136, 0.28);
 }
 
 .kv {
@@ -458,9 +459,9 @@
   width: 100%;
   padding: 8px 10px;
   border-radius: 12px;
-  border: 1px solid #bfdbfe;
-  background: #eff6ff;
-  color: #1e3a8a;
+  border: 1px solid rgba(13, 148, 136, 0.25);
+  background: #ccfbf1;
+  color: #0f766e;
   min-height: 42px;
 }
 
@@ -493,8 +494,8 @@
 }
 
 .Addbutton {
-  border: 1px solid #bfdbfe;
-  background: #eff6ff;
+  border: 1px solid rgba(13, 148, 136, 0.35);
+  background: #ccfbf1;
   color: #0f766e;
   width: 26px;
   height: 26px;

@@ -2,8 +2,8 @@
   min-height: 100vh;
   padding: 0 16px 20px;
   background:
-    radial-gradient(900px 260px at 10% -20%, rgba(20, 184, 166, 0.1), transparent 60%),
-    radial-gradient(900px 260px at 100% -20%, rgba(59, 130, 246, 0.08), transparent 60%),
+    radial-gradient(900px 260px at 10% -20%, rgba(13, 148, 136, 0.1), transparent 60%),
+    radial-gradient(900px 260px at 100% -20%, rgba(13, 148, 136, 0.06), transparent 60%),
     #f3f7fb;
   box-sizing: border-box;
   font-family: "Plus Jakarta Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -41,8 +41,9 @@
 }
 
 .calendar-header button:hover {
-  background: #ecfeff;
-  color: #0f766e;
+  background: #ccfbf1;
+  color: #0d9488;
+  border-color: rgba(13, 148, 136, 0.35);
 }
 
 .calendar-header-actions {
@@ -63,22 +64,22 @@
 }
 
 .save-btn {
-  background: #16a34a;
+  background: linear-gradient(135deg, #0ea5e9 0%, #0d9488 100%);
   color: #fff;
 }
 
 .save-btn:hover {
-  background: #15803d;
+  box-shadow: 0 8px 20px rgba(13, 148, 136, 0.3);
 }
 
 .today-btn {
-  border: 1px solid #2563eb;
-  background: #eff6ff;
-  color: #1d4ed8;
+  border: 1px solid rgba(13, 148, 136, 0.35);
+  background: #ccfbf1;
+  color: #0f766e;
 }
 
 .today-btn:hover {
-  background: #2563eb;
+  background: #0d9488;
   color: #fff;
 }
 
@@ -281,8 +282,8 @@
 }
 
 .calendar-cell.future-appointment {
-  background: #ecfdf5;
-  border-color: #86efac;
+  background: #f0fdf9;
+  border-color: rgba(13, 148, 136, 0.3);
 }
 
 .calendar-entry {
@@ -306,8 +307,8 @@
 }
 
 .calendar-cell.future-appointment .calendar-entry {
-  background: #bbf7d0;
-  border-color: #86efac;
+  background: #ccfbf1;
+  border-color: rgba(13, 148, 136, 0.3);
 }
 
 .repeat-tag {
@@ -377,13 +378,13 @@
 
 .calendar-btn,
 .primary-btn {
-  background: #0f766e;
+  background: linear-gradient(135deg, #0ea5e9 0%, #0d9488 100%);
   color: #fff;
 }
 
 .calendar-btn:hover,
 .primary-btn:hover {
-  background: #0d9488;
+  box-shadow: 0 8px 18px rgba(13, 148, 136, 0.28);
 }
 
 .danger-btn {
