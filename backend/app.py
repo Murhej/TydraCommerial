@@ -5,6 +5,9 @@ import os
 import json
 import stripe
 import logging
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
 from datetime import datetime, timezone, timedelta, date
 from calendar import monthrange
@@ -25,6 +28,9 @@ stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 APP_SECRET_KEY = os.getenv("APP_SECRET_KEY")
 INVITE_PEPPER = os.getenv("INVITE_PEPPER")
+SMTP_USER = os.getenv("SMTP_USER", "")
+SMTP_PASS = os.getenv("SMTP_PASS", "")
+NOTIFY_EMAIL = os.getenv("NOTIFY_EMAIL", SMTP_USER)
 TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24
 MAX_AVATAR_BYTES = 5 * 1024 * 1024
 ALLOWED_AVATAR_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
@@ -88,6 +94,26 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 DB_PATH = "data.db"
+
+
+# ------------------ EMAIL ------------------
+def send_notification_email(subject: str, body: str) -> None:
+    """Send a plain-text notification email to NOTIFY_EMAIL via Gmail SMTP."""
+    if not SMTP_USER or not SMTP_PASS or not NOTIFY_EMAIL:
+        logger.warning("Email notification skipped: SMTP_USER/SMTP_PASS/NOTIFY_EMAIL not configured.")
+        return
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"] = SMTP_USER
+        msg["To"] = NOTIFY_EMAIL
+        msg.attach(MIMEText(body, "plain"))
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as server:
+            server.login(SMTP_USER, SMTP_PASS)
+            server.sendmail(SMTP_USER, NOTIFY_EMAIL, msg.as_string())
+        logger.info("Notification email sent: %s", subject)
+    except Exception as exc:
+        logger.error("Failed to send notification email: %s", exc)
 
 
 @app.route("/", methods=["GET"])
@@ -987,6 +1013,26 @@ def save_data():
         return jsonify({"error": "Referral code already used"}), 409
 
     conn.close()
+
+    # Notify owner by email
+    add_ons = ", ".join(details.get("serviceAddOns") or []) or "None"
+    special = ", ".join(details.get("specialRequests") or []) or "None"
+    email_body = (
+        f"New Quote Request Received\n"
+        f"{'='*40}\n"
+        f"Referral Code : {referral}\n"
+        f"Submitted At  : {details.get('submittedAt', 'N/A')}\n"
+        f"Industry      : {details.get('selectedIndustry', 'N/A')}\n"
+        f"Square Feet   : {details.get('sqft', 'N/A')}\n"
+        f"Pricing Model : {details.get('pricingModel', 'N/A')}\n"
+        f"Frequency     : {details.get('freqCount', 'N/A')} time(s), {details.get('freqTimesPerDay', 'N/A')}x per day\n"
+        f"Service Add-ons: {add_ons}\n"
+        f"Quality Expectations: {details.get('qualityExpectations', 'N/A')}\n"
+        f"Special Requests: {special}\n"
+        f"\nView full details in your admin dashboard.\n"
+    )
+    send_notification_email(f"[Tydra] New Quote Request – {referral}", email_body)
+
     return jsonify({"status": "success", "referralCode": referral})
 
 
@@ -1044,6 +1090,25 @@ def save_contact():
 
     conn.commit()
     conn.close()
+
+    # Notify owner by email
+    name = clean_text(data.get("name"), max_len=120) or "N/A"
+    business = clean_text(data.get("business_name"), max_len=180) or "N/A"
+    client_email = clean_text(data.get("email"), max_len=180) or "N/A"
+    phone = clean_text(data.get("phone"), max_len=40) or "N/A"
+    message = clean_text(data.get("message"), max_len=2000, allow_newlines=True) or "N/A"
+    email_body = (
+        f"New Contact Us Submission\n"
+        f"{'='*40}\n"
+        f"Referral Code : {referral}\n"
+        f"Name          : {name}\n"
+        f"Business Name : {business}\n"
+        f"Email         : {client_email}\n"
+        f"Phone         : {phone}\n"
+        f"Message:\n{message}\n"
+    )
+    send_notification_email(f"[Tydra] New Contact – {name}", email_body)
+
     return jsonify({"success": True})
 
 

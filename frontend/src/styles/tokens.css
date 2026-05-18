@@ -1,22 +1,60 @@
 :root {
-  --color-bg: #edf4fb;
+  /* ── Surface & Background ── */
+  --color-bg: #f8fafc;
   --color-surface: #ffffff;
-  --color-surface-soft: #f6faff;
+  --color-surface-soft: #f1f5f9;
+  --color-surface-raised: #ffffff;
+
+  /* ── Dark sections (hero, footer, stats) ── */
+  --color-dark: #0b1528;
+  --color-dark-mid: #0f2240;
+  --color-dark-soft: #162035;
+
+  /* ── Typography ── */
   --color-text: #0f172a;
+  --color-text-mid: #1e293b;
   --color-text-muted: #64748b;
-  --color-line: #dbe6f2;
+  --color-text-faint: #94a3b8;
+  --color-text-on-dark: #f1f5f9;
+  --color-text-muted-on-dark: #94a3b8;
+
+  /* ── Borders ── */
+  --color-line: #e2e8f0;
+  --color-line-strong: #cbd5e1;
+  --color-line-dark: rgba(255,255,255,0.1);
+
+  /* ── Brand (sky blue) ── */
   --color-brand: #0ea5e9;
-  --color-brand-strong: #2563eb;
-  --color-accent-teal: #0f766e;
-  --color-accent-teal-strong: #0b5d4e;
+  --color-brand-strong: #0284c7;
+  --color-brand-bg: #e0f2fe;
+
+  /* ── Teal accent (clean / hygienic) ── */
+  --color-teal: #0d9488;
+  --color-teal-strong: #0f766e;
+  --color-teal-bg: #ccfbf1;
+
+  /* ── Amber (trust / warmth) ── */
+  --color-amber: #f59e0b;
+  --color-amber-strong: #d97706;
+  --color-amber-bg: #fef3c7;
+
+  /* ── Semantic ── */
   --color-info: #1d4ed8;
   --color-success: #0f766e;
   --color-warning: #b45309;
   --color-error: #dc2626;
-  --gradient-primary: linear-gradient(100deg, #0ea5e9, #2563eb);
-  --gradient-primary-hover: linear-gradient(100deg, #0284c7, #1d4ed8);
-  --gradient-accent: linear-gradient(100deg, #0f766e, #0b5d4e);
 
+  /* ── Gradients ── */
+  --gradient-brand: linear-gradient(135deg, #0ea5e9 0%, #0d9488 100%);
+  --gradient-brand-hover: linear-gradient(135deg, #0284c7 0%, #0f766e 100%);
+  /* Aliases so legacy CSS files resolve correctly */
+  --gradient-primary: linear-gradient(135deg, #0ea5e9 0%, #0d9488 100%);
+  --gradient-primary-hover: linear-gradient(135deg, #0284c7 0%, #0f766e 100%);
+  --gradient-dark: linear-gradient(160deg, #0b1528 0%, #0f2240 100%);
+  --gradient-hero: linear-gradient(160deg, #0b1528 0%, #0f2240 55%, #0b1e38 100%);
+  --gradient-section: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+
+  /* ── Spacing ── */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -24,36 +62,56 @@
   --space-5: 20px;
   --space-6: 24px;
   --space-7: 32px;
+  --space-8: 48px;
+  --space-9: 64px;
 
+  /* ── Radius ── */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
+  --radius-2xl: 28px;
   --radius-pill: 999px;
 
-  --shadow-sm: 0 5px 14px rgba(15, 23, 42, 0.05);
-  --shadow-md: 0 14px 34px rgba(15, 23, 42, 0.08);
-  --shadow-lg: 0 22px 52px rgba(15, 23, 42, 0.14);
+  /* ── Shadows ── */
+  --shadow-xs: 0 2px 6px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.10);
+  --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.14);
+  --shadow-xl: 0 28px 60px rgba(15, 23, 42, 0.18);
+  --shadow-brand: 0 8px 24px rgba(14, 165, 233, 0.30);
+  --shadow-teal: 0 8px 24px rgba(13, 148, 136, 0.30);
 
+  /* ── Motion ── */
   --duration-fast: 120ms;
-  --duration-base: 180ms;
-  --duration-slow: 260ms;
-  --ease-standard: cubic-bezier(0.2, 0, 0.1, 1);
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
 
+  /* ── Z-index ── */
   --z-base: 1;
   --z-sticky: 100;
   --z-overlay: 160;
   --z-modal: 200;
 
+  /* ── Containers ── */
   --container-admin: min(1400px, 100%);
   --container-content: min(1200px, 100%);
   --container-public: min(1480px, 97vw);
 
-  --font-h1: clamp(1.7rem, 1.2rem + 1.6vw, 2.35rem);
-  --font-h2: clamp(1.35rem, 1.1rem + 0.9vw, 1.9rem);
-  --font-h3: clamp(1.15rem, 1rem + 0.45vw, 1.45rem);
-  --font-body: 0.96rem;
+  /* ── Typography scale ── */
+  --font-display: clamp(2.4rem, 1.4rem + 3.2vw, 4rem);
+  --font-h1: clamp(1.85rem, 1.3rem + 1.8vw, 2.75rem);
+  --font-h2: clamp(1.5rem, 1.2rem + 1vw, 2.1rem);
+  --font-h3: clamp(1.2rem, 1.05rem + 0.5vw, 1.55rem);
+  --font-body: 1rem;
+  --font-sm: 0.9rem;
   --font-caption: 0.8rem;
+  --lh-tight: 1.15;
+  --lh-snug: 1.35;
+  --lh-base: 1.6;
+  --lh-loose: 1.75;
 }
 
 .surface-card {
@@ -65,5 +123,5 @@
 
 .focus-ring:focus {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.22);
 }

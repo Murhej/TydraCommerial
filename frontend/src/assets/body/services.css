@@ -13,7 +13,7 @@
 .services__title {
   font-size: clamp(1.9rem, 1.3rem + 1.8vw, 2.6rem);
   font-weight: 800;
-  color: #0f2b46;
+  color: var(--color-dark, #0b1528);
   margin: 0;
 }
 
@@ -41,9 +41,9 @@
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
   border-radius: 999px;
-  border: 1px solid #cfe1f9;
-  background: #eef6ff;
-  color: #1e3a8a;
+  border: 1px solid rgba(13, 148, 136, 0.22);
+  background: var(--color-teal-bg, #ccfbf1);
+  color: var(--color-teal, #0d9488);
   font-weight: 600;
 }
 
@@ -96,27 +96,27 @@
 }
 
 .package--basic {
-  --accent: #0ea5e9;
+  --accent: #0d9488;
 }
 
 .package--addons {
-  --accent: #0284c7;
+  --accent: #0d9488;
 }
 
 .package--premium {
-  --accent: #2563eb;
+  --accent: #0f766e;
 }
 
 .package--basic .package__top {
-  background: linear-gradient(0deg, #ffffff 70%, #0ea5e90f);
+  background: linear-gradient(0deg, #ffffff 70%, rgba(13,148,136,0.06));
 }
 
 .package--addons .package__top {
-  background: linear-gradient(0deg, #ffffff 70%, #0284c70f);
+  background: linear-gradient(0deg, #ffffff 70%, rgba(13,148,136,0.06));
 }
 
 .package--premium .package__top {
-  background: linear-gradient(0deg, #ffffff 70%, #2563eb0f);
+  background: linear-gradient(0deg, #ffffff 70%, rgba(15,118,110,0.06));
 }
 
 .package-head {
@@ -276,11 +276,11 @@
 }
 
 .btn-primary {
-  border: 1px solid #2563eb;
+  border: 1px solid var(--color-teal, #0d9488);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.28);
+  box-shadow: 0 12px 24px rgba(13, 148, 136, 0.28);
 }
 
 .btn-secondary {
@@ -288,7 +288,7 @@
 }
 
 .btn-secondary:hover {
-  border-color: #bfdbfe;
+  border-color: rgba(13, 148, 136, 0.35);
 }
 
 .btn-tertiary {
@@ -298,7 +298,7 @@
 }
 
 .btn-tertiary:hover {
-  border-color: #bfdbfe;
+  border-color: rgba(13, 148, 136, 0.35);
 }
 
 @media (max-width: 640px) {
@@ -353,7 +353,7 @@
 .cta-band {
   margin-top: 1.25rem;
   border-radius: 12px;
-  background: linear-gradient(135deg, #f1f7ff, #e8f1ff);
+  background: linear-gradient(135deg, #f0fdf9, #ccfbf1);
 }
 
 .cta-band__inner {

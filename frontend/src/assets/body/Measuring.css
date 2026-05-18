@@ -1,12 +1,336 @@
+/* ═══════════════════════════════════
+   PRICING / MEASURING  –  Premium
+═══════════════════════════════════ */
+
 .measurings {
-  margin-top: 1rem;
-  border-radius: 18px;
-  border: 1px solid #dce7f2;
-  background: #ffffff;
-  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.08);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-line);
+  background: var(--color-bg, #f8fafc);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
-  min-height: 420px;
 }
+
+/* ── Section header ── */
+.pricing-head {
+  padding: 1.4rem 1.4rem 0.6rem;
+  text-align: center;
+}
+
+.pricing-head .section-label {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-teal);
+  background: var(--color-teal-bg);
+  padding: 0.32rem 0.85rem;
+  border-radius: var(--radius-pill);
+  margin-bottom: 0.6rem;
+}
+
+.pricing-head h3 {
+  margin: 0;
+  color: var(--color-dark);
+  font-size: var(--font-h2);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.pricing-head p {
+  margin: 0.4rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.97rem;
+  line-height: var(--lh-base);
+}
+
+/* ── Tab bar ── */
+.Measuring-body {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 1.2rem;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-line);
+  border-top: 1px solid var(--color-line);
+}
+
+.tab {
+  appearance: none;
+  min-width: 110px;
+  height: 40px;
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+  color: var(--color-text-mid);
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--duration-base);
+}
+
+.tab:hover {
+  background: var(--color-teal-bg);
+  border-color: rgba(13, 148, 136, 0.3);
+  color: var(--color-teal);
+}
+
+.tab.active {
+  background: var(--gradient-brand);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 6px 18px rgba(13, 148, 136, 0.3);
+}
+
+/* ── Expand panels ── */
+.expand-wrapper {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 320ms ease, opacity 220ms ease;
+}
+
+.expand-wrapper.open {
+  max-height: 120rem;
+  opacity: 1;
+}
+
+.expand-Sqft,
+.expand-Hourly {
+  padding: 1.2rem 1.4rem;
+}
+
+.expand-Contract {
+  padding: 1.2rem 1.4rem;
+}
+
+.expand-Sqft {
+  display: grid;
+  gap: 1rem;
+}
+
+.sqft-text {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.expand-Sqft-text {
+  margin: 0;
+  color: var(--color-text-mid);
+  line-height: 1.6;
+  font-size: 0.97rem;
+}
+
+.expand-Sqft-text.note {
+  padding: 0.8rem;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-line);
+}
+
+.text-primary {
+  color: var(--color-teal);
+  font-weight: 700;
+}
+
+.pricing-recommendation {
+  margin: 0;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(13, 148, 136, 0.25);
+  background: var(--color-teal-bg);
+  color: var(--color-teal-strong, #0f766e);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* ── Sqft table ── */
+.sqft-table-wrap {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  overflow: auto;
+  background: var(--color-surface);
+  scrollbar-width: thin;
+}
+
+.sqft-rate-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.sqft-rate-table th {
+  background: var(--color-dark);
+  color: rgba(241, 245, 249, 0.9);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-align: center;
+  padding: 0.8rem 0.7rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sqft-rate-table th:first-child {
+  text-align: left;
+  padding-left: 1rem;
+}
+
+.sqft-rate-table th:last-child { border-right: none; }
+
+.sqft-rate-table td {
+  background: var(--color-bg);
+  color: var(--color-text-mid);
+  font-size: 0.93rem;
+  text-align: center;
+  padding: 0.8rem 0.6rem;
+  border-right: 1px solid var(--color-line);
+  border-top: 1px solid var(--color-line);
+}
+
+.sqft-rate-table td:first-child {
+  font-weight: 700;
+  background: #f1f5f9;
+  text-align: left;
+  padding-left: 1rem;
+}
+
+.sqft-rate-table td:last-child { border-right: none; }
+
+/* ── Hourly ── */
+.expand-Hourly {
+  display: flex;
+  justify-content: center;
+}
+
+/* ── Contract ── */
+.expand-Contract {
+  display: grid;
+  gap: 1rem;
+}
+
+.contract-intro h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-dark);
+}
+
+.contract-intro p {
+  margin: 0.45rem 0 0;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+.contract-table-wrap {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  overflow: auto;
+  background: var(--color-surface);
+}
+
+.contract-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+
+.contract-table th {
+  background: var(--color-bg);
+  color: var(--color-dark);
+  text-align: left;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.78rem 0.9rem;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.contract-table td {
+  padding: 0.78rem 0.9rem;
+  border-bottom: 1px solid var(--color-line);
+  color: var(--color-text-mid);
+  font-size: 0.93rem;
+  vertical-align: middle;
+}
+
+.contract-table tbody tr:last-child td { border-bottom: none; }
+
+.contract-table tbody tr:hover td { background: var(--color-bg); }
+
+/* ── Discount badges ── */
+.discount-badge {
+  display: inline-block;
+  padding: 0.22rem 0.65rem;
+  border-radius: var(--radius-pill);
+  background: var(--gradient-brand);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.discount-badge.neutral {
+  background: var(--color-line);
+  color: var(--color-text-mid);
+}
+
+/* ── Hourly box ── */
+.hourly-box {
+  width: min(920px, 100%);
+  background: var(--color-bg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  padding: 1.1rem 1.2rem;
+}
+
+.hourly-box h4 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-dark);
+}
+
+.hourly-box p {
+  margin: 0.3rem 0 0.55rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+.hourly-box ul {
+  margin: 0.2rem 0 0.75rem;
+  padding-left: 1.05rem;
+  color: var(--color-text-mid);
+  line-height: 1.5;
+}
+
+.hourly-cta {
+  color: var(--color-teal);
+  font-weight: 700;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .expand-Sqft,
+  .expand-Hourly,
+  .expand-Contract { padding: 1rem; }
+}
+
+@media (max-width: 768px) {
+  .pricing-head { text-align: left; padding: 1rem 1rem 0.4rem; }
+  .Measuring-body { justify-content: flex-start; overflow-x: auto; padding: 0.8rem 0.8rem; }
+  .tab { min-width: 102px; flex: 0 0 auto; }
+}
+
+@media (max-width: 560px) {
+  .Measuring-body { padding: 0.75rem 0.7rem; gap: 0.4rem; scrollbar-width: thin; }
+  .tab { min-width: 90px; height: 38px; font-size: 0.85rem; padding: 0.3rem 0.6rem; flex: 0 0 auto; }
+  .expand-Sqft, .expand-Hourly, .expand-Contract { padding: 0.9rem; }
+  .contract-table { min-width: 560px; }
+  .sqft-rate-table { min-width: 700px; }
+}
+
 
 .pricing-head {
   padding: 1rem 1rem 0.5rem;
@@ -54,10 +378,10 @@
 }
 
 .tab.active {
-  background: #2563eb;
+  background: var(--gradient-brand, linear-gradient(135deg, #0ea5e9, #0d9488));
   color: #ffffff;
-  border-color: #2563eb;
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.24);
+  border-color: var(--color-teal, #0d9488);
+  box-shadow: 0 10px 20px rgba(13, 148, 136, 0.28);
 }
 
 .expand-wrapper {
@@ -106,7 +430,7 @@
 }
 
 .text-primary {
-  color: #2563eb;
+  color: var(--color-teal, #0d9488);
   font-weight: 700;
 }
 

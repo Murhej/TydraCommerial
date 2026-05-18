@@ -1,26 +1,24 @@
 import React from 'react';
 import { Link } from "react-router-dom";
 import CleaningIllustration from "../Img/CleaningIllustration.png";
-// DisplayPage.jsx
 import "./DisplayPage.css";
 
 export default function DisplayPage({onNext}) {
-  
-
   return (
     <section className="hero">
       <div className="hero__content">
+        <div className="hero__eyebrow">Toronto & GTA Commercial Cleaning</div>
         <h1 className="hero__title">
-          Spotless Commercial Cleaning for GTA Businesses
+          Keep Your Business <mark>Spotless</mark>, Every Single Day
         </h1>
         <p className="hero__subtitle">
-          Reliable office, clinic, and commercial cleaning across Toronto and the GTA.
+          Professional commercial cleaning for offices, clinics, and workspaces across Toronto and the GTA. Reliable, discreet, and built around your schedule.
         </p>
         <div className="hero__actions">
-          <button type="button" onClick={onNext} className="hero__button ui-btn primary lg">
+          <button type="button" onClick={onNext} className="hero__button primary">
             Get a Free Quote
           </button>
-          <Link to="/services" className="hero__button secondary ui-btn secondary lg">
+          <Link to="/services" className="hero__button secondary">
             View Services
           </Link>
         </div>

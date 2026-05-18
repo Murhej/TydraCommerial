@@ -1,14 +1,14 @@
 .contact-section {
-  --ci-primary: #2563eb;
-  --ci-primary-700: #1d4ed8;
-  --ci-ink: #1f2937;
-  --ci-muted: #6b7280;
-  --ci-bg: #f3f5f7;
-  --ci-card: #ffffff;
-  --ci-border: #e5e7eb;
-  --ci-shadow: rgba(0, 0, 0, 0.08);
+  --ci-primary: var(--color-teal, #0d9488);
+  --ci-primary-700: var(--color-teal-strong, #0f766e);
+  --ci-ink: var(--color-dark, #0b1528);
+  --ci-muted: var(--color-text-muted, #64748b);
+  --ci-bg: var(--color-bg, #f8fafc);
+  --ci-card: var(--color-surface, #ffffff);
+  --ci-border: var(--color-line, #e2e8f0);
+  --ci-shadow: rgba(11, 21, 40, 0.08);
 
-  font-family: "Poppins", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
   color: var(--ci-ink);
   background: var(--ci-bg);
   display: flex;
@@ -176,9 +176,9 @@
 .contact-section .draft-pill {
   display: inline-flex;
   align-items: center;
-  border: 1px solid #dbe5ef;
-  background: #f8fbff;
-  color: #475569;
+  border: 1px solid var(--ci-border);
+  background: var(--ci-bg);
+  color: var(--ci-muted);
   border-radius: 999px;
   padding: 0.28rem 0.64rem;
   font-size: 0.75rem;
@@ -239,7 +239,7 @@
 .contact-section .field input:focus,
 .contact-section .field textarea:focus {
   border-color: var(--ci-primary);
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.16);
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.18);
   transform: translateY(-1px);
 }
 

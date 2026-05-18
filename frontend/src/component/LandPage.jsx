@@ -19,8 +19,6 @@ import Facebook from "../assets/Img/icon-facebook.svg";
 import Instagram from "../assets/Img/icon-instagram.svg";
 import Tiktok from "../assets/Img/Tiktok.svg";
 
-
-
 function Landingpage() {
   usePageMeta(
     "Commercial Cleaning Services",
@@ -42,22 +40,30 @@ function Landingpage() {
       <Header />
 
       <div className="body">
-        {/* display page */}
+        {/* Hero */}
         <DisplayPage onNext={goToQuoteForm} />
 
-        {/* Message */}
+        {/* Why Us */}
         <DisplayMessage />
 
-        {/* Service */}
+        {/* Services */}
         <ServicesGrid />
+
+        {/* Pricing */}
         <Measuring />
 
-        {/* Quote */}
+        {/* Quote Form */}
         <QuoteForm innerRef={refQuoteForm} />
       </div>
 
       <footer className="footer">
         <div className="footer__container">
+          {/* Brand */}
+          <div className="footer__column footer__column--brand">
+            <div className="footer__brand-name">Tydra</div>
+            <p className="footer__brand-tagline">Professional commercial cleaning across Toronto and the GTA.</p>
+          </div>
+
           {/* Contact */}
           <div className="footer__column">
             <h3 className="footer__header">Contact</h3>
@@ -69,8 +75,8 @@ function Landingpage() {
           {/* Business Hours */}
           <div className="footer__column">
             <h3 className="footer__header">Business Hours</h3>
-            <p>Mon-Fri: 9 am-6 pm</p>
-            <p>Sat: 10 am-6 pm</p>
+            <p>Mon–Fri: 9 am – 6 pm</p>
+            <p>Sat: 10 am – 6 pm</p>
             <p>Sun: Closed</p>
           </div>
 
@@ -79,9 +85,10 @@ function Landingpage() {
             <h3 className="footer__header">Follow Us</h3>
             <div className="footer__social-icons">
               <a
-                href="https://www.facebook.com/"  // put your real page link here
+                href="https://www.facebook.com/"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Facebook"
               >
                 <img src={Facebook} alt="Facebook" />
               </a>
@@ -90,6 +97,7 @@ function Landingpage() {
                 href="https://www.instagram.com/tydracommercial/"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Instagram"
               >
                 <img src={Instagram} alt="Instagram" />
               </a>
@@ -98,15 +106,14 @@ function Landingpage() {
                 href="https://www.tiktok.com/@tydracommercial?lang=en"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="TikTok"
               >
                 <img src={Tiktok} alt="TikTok" />
               </a>
             </div>
-          </div>
 
-          {/* Payments & Trust */}
-          <div className="footer__column">
-            <h3 className="footer__header">Payments &amp; Trust</h3>
+            {/* Payments */}
+            <h3 className="footer__header" style={{ marginTop: "1.1rem" }}>We Accept</h3>
             <div className="footer__payment-icons">
               <img src={Visa} alt="Visa" />
               <img src={Mastercard} alt="Mastercard" />
@@ -114,6 +121,10 @@ function Landingpage() {
               <img src={Paypal} alt="PayPal" />
             </div>
           </div>
+        </div>
+
+        <div className="footer__bottom">
+          <p>© {new Date().getFullYear()} Tydra Commercial Cleaning. All rights reserved.</p>
         </div>
       </footer>
     </div>

@@ -903,18 +903,6 @@ export default function QuoteForm({ innerRef }) {
           </p>
 
           <div className="Quote-body">
-            <input
-              type="number"
-              name="SqFt"
-              min={0}
-              placeholder="Enter SqFt"
-              value={sqft}
-              onChange={(e) => {
-                setSqft(e.target.value);
-                setStepError("");
-              }}
-            />
-
             <div className="radio-selections">
               {Object.keys(industryDetails).map((industry, index) => (
                 <div className="radio-option" key={industry}>
@@ -935,11 +923,18 @@ export default function QuoteForm({ innerRef }) {
                 </div>
               ))}
             </div>
-            {selectedIndustry && (
-              <p className="selected-industry-note">
-                Selected: <strong>{selectedIndustry}</strong>
-              </p>
-            )}
+
+            <input
+              type="number"
+              name="SqFt"
+              min={0}
+              placeholder="Enter SqFt"
+              value={sqft}
+              onChange={(e) => {
+                setSqft(e.target.value);
+                setStepError("");
+              }}
+            />
           </div>
 
           <div className={`step-actions ${summaryEditStep === 1 ? "" : "step-actions--single"}`.trim()}>
