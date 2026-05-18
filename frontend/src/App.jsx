@@ -4,6 +4,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 const About = lazy(() => import("./assets/body/About/About"));
 const Landingpage = lazy(() => import("./component/LandPage"));
 const Contact = lazy(() => import("./assets/body/contactus/contactus"));
+const ContactSent = lazy(() => import("./assets/body/contactus/ContactSent"));
 const QuoteForm = lazy(() => import("./assets/body/QuoteForm"));
 const ServicesSection = lazy(() => import("./assets/body/services"));
 
@@ -38,6 +39,8 @@ function App() {
         <Route path="/" element={<Landingpage />} />
         <Route path="/about" element={<About />} />
         <Route path="/contactus" element={<Contact />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/contact-sent" element={<ContactSent />} />
         <Route path="/quote" element={<QuoteForm />} />
         <Route path="/services" element={<ServicesSection />} />
 

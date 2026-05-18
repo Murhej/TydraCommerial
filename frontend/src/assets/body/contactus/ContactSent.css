@@ -1,0 +1,183 @@
+.sent-page {
+  --sp-teal: var(--color-teal, #0d9488);
+  --sp-teal-strong: var(--color-teal-strong, #0f766e);
+  --sp-teal-bg: var(--color-teal-bg, #ccfbf1);
+  --sp-ink: var(--color-dark, #0b1528);
+  --sp-muted: #64748b;
+  --sp-bg: var(--color-bg, #f8fafc);
+  --sp-card: var(--color-surface, #ffffff);
+  --sp-border: #e2e8f0;
+
+  font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  background: var(--sp-bg);
+  color: var(--sp-ink);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.sent-container {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3rem 1.25rem 5rem;
+}
+
+.sent-card {
+  background: var(--sp-card);
+  border: 1px solid var(--sp-border);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(11, 21, 40, 0.07);
+  padding: 2.5rem 2rem;
+  max-width: 540px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  text-align: center;
+}
+
+.sent-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.sent-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--sp-ink);
+  margin: 0;
+}
+
+.sent-sub {
+  color: var(--sp-muted);
+  font-size: 0.975rem;
+  margin: 0;
+  max-width: 400px;
+}
+
+/* Email confirmation rows */
+.sent-emails {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sent-email-row {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  background: var(--sp-teal-bg);
+  border: 1px solid rgba(13, 148, 136, 0.2);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  text-align: left;
+}
+
+.sent-email-icon {
+  font-size: 1.35rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sent-email-row strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--sp-teal-strong);
+  margin-bottom: 2px;
+}
+
+.sent-email-row p {
+  font-size: 0.83rem;
+  color: var(--sp-muted);
+  margin: 0;
+}
+
+.sent-email-addr {
+  font-weight: 600;
+  color: var(--sp-teal-strong);
+}
+
+/* Survey */
+.survey-block {
+  width: 100%;
+  background: #f8fafc;
+  border: 1px solid var(--sp-border);
+  border-radius: 14px;
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.survey-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--sp-ink);
+  margin: 0;
+}
+
+.stars {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 2.1rem;
+  color: #d1d5db;
+  padding: 0 2px;
+  line-height: 1;
+  transition: color 0.12s, transform 0.1s;
+}
+
+.star-btn.active {
+  color: #f59e0b;
+}
+
+.star-btn:hover {
+  transform: scale(1.18);
+}
+
+.survey-hint {
+  font-size: 0.82rem;
+  color: var(--sp-muted);
+  min-height: 1.2em;
+  margin: 0;
+}
+
+.survey-thanks {
+  font-size: 0.92rem;
+  color: var(--sp-teal-strong);
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Actions */
+.sent-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 480px) {
+  .sent-card {
+    padding: 2rem 1.1rem;
+  }
+
+  .sent-title {
+    font-size: 1.45rem;
+  }
+
+  .star-btn {
+    font-size: 1.75rem;
+  }
+}
