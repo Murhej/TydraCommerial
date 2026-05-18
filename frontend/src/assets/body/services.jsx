@@ -162,10 +162,10 @@ const servicePackages = [
 ];
 
 const highlights = [
-  { icon: "+", label: "Locally owned family team" },
-  { icon: "+", label: "Eco-friendly product options" },
-  { icon: "+", label: "Background-checked professionals" },
-  { icon: "+", label: "Flexible scheduling" }
+  { icon: "✓", label: "Locally owned family team" },
+  { icon: "✓", label: "Eco-friendly product options" },
+  { icon: "✓", label: "Background-checked professionals" },
+  { icon: "✓", label: "Flexible scheduling" }
 ];
 
 export default function ServicesSection() {
@@ -182,6 +182,7 @@ export default function ServicesSection() {
 
       <div className="services__container">
         <header className="services__hero">
+          <span className="services__label">Commercial Cleaning</span>
           <h2 id="services-title" className="services__title">Our Services</h2>
           <p className="services__subtitle">
             Choose a plan that fits your space. Start with <strong>Basic</strong>, layer any <strong>Add-Ons</strong>,
@@ -288,7 +289,10 @@ export default function ServicesSection() {
 
         <div className="cta-band">
           <div className="cta-band__inner">
-            <p className="cta-text">Ready for a custom quote?</p>
+            <div className="cta-band__text-group">
+              <p className="cta-text">Ready for a custom quote?</p>
+              <p className="cta-sub">We'll build a scope around your schedule, space, and budget.</p>
+            </div>
             <Link className="btn-primary ui-btn primary md" to="/contactus">Get a Free Estimate</Link>
           </div>
         </div>

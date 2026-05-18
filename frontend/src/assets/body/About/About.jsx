@@ -70,6 +70,7 @@ export default function About() {
 
       <main className="container">
         <section className="hero" aria-labelledby="hero-title">
+          <span className="hero-label">Toronto & GTA Commercial Cleaning</span>
           <h1 id="hero-title" className="hero-title">Clean More, Save More</h1>
           <p className="hero-text">
             Founded by a mother-son team and run daily by our family, <strong>Tydra</strong> is your trusted
@@ -103,7 +104,7 @@ export default function About() {
                 <article key={pkg.title} className="package" aria-labelledby={`pkg-${i}-title`}>
                   <div className="package-head">
                     <span className="pkg-badge" aria-hidden="true">
-                      {pkg.title === "Premium" ? "*" : "?"}
+                      {pkg.title === "Basic" ? "B" : pkg.title === "Add-Ons" ? "+" : "P"}
                     </span>
                     <h3 id={`pkg-${i}-title`} className="package-title">{pkg.title}</h3>
                   </div>
@@ -114,7 +115,6 @@ export default function About() {
                     {visibleItems.map((item, j) => (
                       <li key={`${pkg.title}-${item.subTitle}-${j}`} className="package-item">
                         <div className="pi-title">
-                          <span className="pi-dot" aria-hidden="true">*</span>
                           <strong className="pi-heading">{item.subTitle}</strong>
                         </div>
 
@@ -202,54 +202,40 @@ export default function About() {
         </section>
       </main>
 
-      <footer className="footer">
-        <div className="footer__container">
-          <div className="footer__column">
-            <h3 className="footer__header">Contact</h3>
+      <footer className="about-footer">
+        <div className="footer-grid">
+          <div className="footer-col">
+            <h3 className="footer-col__header">Contact</h3>
             <p>Toronto, ON</p>
             <p>(647) 877-3741</p>
             <p>tydra.gta.cleaning@gmail.com</p>
           </div>
 
-          <div className="footer__column">
-            <h3 className="footer__header">Business Hours</h3>
-            <p>Mon-Fri: 9 am-6 pm</p>
-            <p>Sat: 10 am-6 pm</p>
+          <div className="footer-col">
+            <h3 className="footer-col__header">Business Hours</h3>
+            <p>Mon-Fri: 9 am–6 pm</p>
+            <p>Sat: 10 am–6 pm</p>
             <p>Sun: Closed</p>
           </div>
 
-          <div className="footer__column">
-            <h3 className="footer__header">Follow Us</h3>
-            <div className="footer__social-icons">
-              <a
-                href="https://www.facebook.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+          <div className="footer-col">
+            <h3 className="footer-col__header">Follow Us</h3>
+            <div className="footer-social">
+              <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">
                 <img src={Facebook} alt="Facebook" />
               </a>
-
-              <a
-                href="https://www.instagram.com/tydracommercial/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href="https://www.instagram.com/tydracommercial/" target="_blank" rel="noopener noreferrer">
                 <img src={Instagram} alt="Instagram" />
               </a>
-
-              <a
-                href="https://www.tiktok.com/@tydracommercial?lang=en"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href="https://www.tiktok.com/@tydracommercial?lang=en" target="_blank" rel="noopener noreferrer">
                 <img src={Tiktok} alt="TikTok" />
               </a>
             </div>
           </div>
 
-          <div className="footer__column">
-            <h3 className="footer__header">Payments &amp; Trust</h3>
-            <div className="footer__payment-icons">
+          <div className="footer-col">
+            <h3 className="footer-col__header">Payments &amp; Trust</h3>
+            <div className="footer-payments">
               <img src={Visa} alt="Visa" />
               <img src={Mastercard} alt="Mastercard" />
               <img src={Amex} alt="American Express" />
