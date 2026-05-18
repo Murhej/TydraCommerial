@@ -1,14 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ApiError, apiPost } from "../../lib/apiClient";
 import { InlineNotice } from "../../components/ui/PageStates";
 
 import "./QuoteForm.css";
 
 const DRAFT_STORAGE_KEY = "tydra_quote_form_draft_v1";
+const CONTACT_DRAFT_KEY = "tydra_contact_form_draft_v1";
 
 export default function QuoteForm({ innerRef }) {
   const NO_SPECIAL_REQUEST = "No special requests";
   const NO_SHARED_SPACES = "No shared spaces";
+  const navigate = useNavigate();
 
   // -------------------------
   // Core state
@@ -627,10 +630,43 @@ export default function QuoteForm({ innerRef }) {
 
     try {
       await apiPost("/data", payload);
-      setSubmitTone("success");
-      setSubmitMessage(`Submission complete. Referral Code: ${payload.referralCode}`);
+      // Build contact note with full quote summary pre-filled
+      const sharedSummary = (footTrafficAnswers["Shared Spaces - (choose that apply)"] || [])
+        .filter(item => item !== NO_SHARED_SPACES).join(", ") || "None";
+      const srSummary = specialRequests.filter(x => x !== NO_SPECIAL_REQUEST).join(", ") || "None";
+      const aoSummary = serviceAddOns.length === 0 || serviceAddOns.includes("No add-on")
+        ? "None" : serviceAddOns.join(", ");
+      const freqUnit = cleaningAnswers["Frequency"] === "Daily" ? "day" : "week";
+      const freqSummary = `${cleaningAnswers["Frequency"] || "-"}${freqCount ? ` | Times per ${freqUnit}: ${freqCount}` : ""}`;
+      const contactNote = [
+        "=== Quote Summary ===",
+        "",
+        "Space Details: SqFt: " + (sqft || "-") + " | Industry: " + (selectedIndustry || "-"),
+        "Usage & Foot Traffic: Traffic: " + (footTrafficAnswers["Foot traffic"] || "-") + " | Hours: " + (footTrafficAnswers["Operating Hours"] || "-") + " | Shared: " + sharedSummary,
+        "Cleaning Frequency: " + freqSummary,
+        "Special Requests: " + srSummary,
+        "Conditions & Challenges: Condition: " + (conditionAnswers["Current Condition"] || "-") + " | Problem: " + (conditionAnswers["Current Problem"] || "-"),
+        "Preferred Pricing Model: " + (pricingModel || "-"),
+        "Service Add-ons: " + aoSummary,
+        "Quality Expectations: " + (qualityExpectations || "-"),
+        "",
+        "--- Add your comments below ---",
+        ""
+      ].join("\n");
+      try {
+        const nowLabel = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        window.localStorage.setItem(CONTACT_DRAFT_KEY, JSON.stringify({
+          name: "", business_name: "", email: "", phone: "",
+          referral_code: payload.referralCode,
+          message: contactNote,
+          draftSavedAt: nowLabel
+        }));
+      } catch { /* ignore quota issues */ }
       clearDraft();
       setDraftSavedAt("");
+      setSubmitTone("success");
+      setSubmitMessage("Submission complete. Referral Code: " + payload.referralCode + " — Taking you to Contact…");
+      setTimeout(() => navigate("/contact"), 1800);
     } catch (err) {
       console.error("Error sending data:", err);
       if (err instanceof ApiError) {
@@ -1436,6 +1472,12 @@ export default function QuoteForm({ innerRef }) {
                 ))}
               </div>
             </div>
+          )}
+
+          {pricingModel && (
+            <p className="field-info-inline" style={{ marginTop: "10px", background: "#ccfbf1", border: "1px solid rgba(13,148,136,0.25)", borderRadius: "10px", padding: "10px 14px", color: "#0f766e" }}>
+              <strong>Note:</strong> Your preferred model is a starting point. Our team may suggest adjustments after reviewing your full service profile and completing an on-site assessment.
+            </p>
           )}
 
           <div className="step-actions">
