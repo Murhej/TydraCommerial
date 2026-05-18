@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../../header/HeaderPage";
-import { ApiError, apiPost } from "../../../lib/apiClient";
+import { apiPost } from "../../../lib/apiClient";
 import usePageMeta from "../../../hooks/usePageMeta";
 import emailjs from "@emailjs/browser";
 import "./ContactInfo.css";
@@ -18,6 +19,7 @@ const CONTACT_DRAFT_STORAGE_KEY = "tydra_contact_form_draft_v1";
 
 export default function ContactInfo() {
   usePageMeta("Contact Us", "Contact Tydra for a fast commercial cleaning quote.");
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     business_name: "",
@@ -150,25 +152,25 @@ export default function ContactInfo() {
       setStatus({ type: "err", text: "Please fix the highlighted fields." });
       return;
     }
-    try {
-      await apiPost("/save_contact", {
-        referral: formData.referral_code,
-        name: formData.name,
-        business_name: formData.business_name,
-        email: formData.email,
-        phone: formData.phone,
-        message: formData.message
-      });
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setStatus({ type: "err", text: err.message || "Unable to save your details right now." });
-        return;
-      }
-      setStatus({ type: "err", text: "Unable to save your details right now." });
-      return;
-    }
 
     setIsSending(true);
+
+    // Capture values before clearing state
+    const submittedName = formData.name;
+    const submittedEmail = formData.email;
+    const submittedReferral = formData.referral_code;
+
+    // Fire-and-forget: save to DB (non-blocking — user proceeds even if this fails)
+    apiPost("/save_contact", {
+      referral: submittedReferral,
+      name: submittedName,
+      business_name: formData.business_name,
+      email: submittedEmail,
+      phone: formData.phone,
+      message: formData.message
+    }).catch(() => { /* non-critical — DB save best-effort */ });
+
+    // Send via emailjs (best-effort — don't block redirect on failure)
     try {
       await emailjs.sendForm(
         "service_0tgnh98",
@@ -176,24 +178,27 @@ export default function ContactInfo() {
         formRef.current,
         "qX6SW6EHquUVW_igH"
       );
-      setStatus({ type: "ok", text: "Thank you! Your message has been sent." });
-      setFormData({
-        name: "",
-        business_name: "",
-        email: "",
-        phone: "",
-        referral_code: "",
-        message: "",
-        bot_field: ""
-      });
-      clearContactDraft();
-      setDraftSavedAt("");
-      formRef.current?.reset();
     } catch {
-      setStatus({ type: "err", text: "Oops! Something went wrong. Please try again." });
-    } finally {
-      setIsSending(false);
+      // EmailJS failed — still navigate, team will see backend notification email
     }
+
+    // Always clear form and redirect
+    setFormData({
+      name: "",
+      business_name: "",
+      email: "",
+      phone: "",
+      referral_code: "",
+      message: "",
+      bot_field: ""
+    });
+    clearContactDraft();
+    setDraftSavedAt("");
+    formRef.current?.reset();
+    setIsSending(false);
+    navigate("/contact-sent", {
+      state: { name: submittedName, email: submittedEmail, referral: submittedReferral }
+    });
   };
 
   // Auto-resize textarea
