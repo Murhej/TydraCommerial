@@ -96,9 +96,84 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 DB_PATH = "data.db"
 
 
-# ------------------ EMAIL ------------------
-def send_notification_email(subject: str, body: str) -> None:
-    """Send a plain-text notification email to NOTIFY_EMAIL via Gmail SMTP."""
+# ------------------ EMAIL HELPERS ------------------
+
+def _email_html(title: str, content: str, cta_label: str = None, cta_href: str = None) -> str:
+    """Wrap content in a branded Tydra HTML email shell."""
+    cta_block = ""
+    if cta_label and cta_href:
+        cta_block = (
+            f'<tr><td style="padding:0 32px 28px;">'
+            f'<a href="{cta_href}" style="display:inline-block;background:#0d9488;color:#ffffff;'
+            f'font-weight:700;font-size:14px;text-decoration:none;padding:12px 28px;'
+            f'border-radius:8px;">{cta_label}</a></td></tr>'
+        )
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:32px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(11,21,40,0.08);">
+
+        <!-- Header -->
+        <tr>
+          <td style="background:#0d9488;padding:28px 32px;">
+            <p style="margin:0;font-size:22px;font-weight:800;color:#ffffff;letter-spacing:-0.3px;">Tydra Cleaning</p>
+            <p style="margin:4px 0 0;font-size:13px;color:#99f6e4;">{title}</p>
+          </td>
+        </tr>
+
+        <!-- Body -->
+        <tr><td style="padding:28px 32px 8px;">{content}</td></tr>
+
+        <!-- CTA -->
+        {cta_block}
+
+        <!-- Footer -->
+        <tr>
+          <td style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:20px 32px;">
+            <p style="margin:0;font-size:12px;color:#94a3b8;line-height:1.6;">
+              <strong style="color:#64748b;">Tydra Cleaning Services</strong><br>
+              Toronto, ON &nbsp;|&nbsp; (647) 877-3741 &nbsp;|&nbsp; tydra.gta.cleaning@gmail.com
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>"""
+
+
+def _row(label: str, value: str) -> str:
+    """Single data row for email tables."""
+    return (
+        f'<tr>'
+        f'<td style="padding:8px 12px;font-size:13px;color:#64748b;font-weight:600;'
+        f'white-space:nowrap;vertical-align:top;width:38%;">{label}</td>'
+        f'<td style="padding:8px 12px;font-size:13px;color:#0f172a;vertical-align:top;">{value}</td>'
+        f'</tr>'
+    )
+
+
+def _section(heading: str, rows_html: str) -> str:
+    return (
+        f'<p style="margin:0 0 6px;font-size:11px;font-weight:700;color:#0d9488;'
+        f'text-transform:uppercase;letter-spacing:0.06em;">{heading}</p>'
+        f'<table width="100%" cellpadding="0" cellspacing="0" '
+        f'style="border:1px solid #e2e8f0;border-radius:10px;border-collapse:separate;'
+        f'border-spacing:0;overflow:hidden;margin-bottom:20px;">'
+        f'{rows_html}'
+        f'</table>'
+    )
+
+
+# ------------------ EMAIL SEND FUNCTIONS ------------------
+
+def send_notification_email(subject: str, body: str, html_body: str = None) -> None:
+    """Send a notification email to NOTIFY_EMAIL via Gmail SMTP."""
     if not SMTP_USER or not SMTP_PASS or not NOTIFY_EMAIL:
         logger.warning("Email notification skipped: SMTP_USER/SMTP_PASS/NOTIFY_EMAIL not configured.")
         return
@@ -108,12 +183,69 @@ def send_notification_email(subject: str, body: str) -> None:
         msg["From"] = SMTP_USER
         msg["To"] = NOTIFY_EMAIL
         msg.attach(MIMEText(body, "plain"))
+        if html_body:
+            msg.attach(MIMEText(html_body, "html"))
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as server:
             server.login(SMTP_USER, SMTP_PASS)
             server.sendmail(SMTP_USER, NOTIFY_EMAIL, msg.as_string())
         logger.info("Notification email sent: %s", subject)
     except Exception as exc:
         logger.error("Failed to send notification email: %s", exc)
+
+
+def send_client_confirmation_email(to_email: str, to_name: str, referral: str) -> None:
+    """Send a branded no-reply confirmation email to the client."""
+    if not SMTP_USER or not SMTP_PASS:
+        logger.warning("Client confirmation email skipped: SMTP credentials not configured.")
+        return
+    if not to_email:
+        return
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = "We received your message \u2013 Tydra Cleaning"
+        msg["From"] = f"Tydra Cleaning (No Reply) <{SMTP_USER}>"
+        msg["To"] = to_email
+        msg["Reply-To"] = SMTP_USER
+
+        greeting = f"Hi {to_name}," if to_name and to_name != "N/A" else "Hi there,"
+        ref_row = _row("Reference #", f'<strong style="color:#0d9488;">{referral}</strong>') if referral else ""
+
+        content = (
+            f'<p style="margin:0 0 20px;font-size:15px;color:#0f172a;line-height:1.6;">'
+            f'{greeting}<br><br>'
+            f'Thanks for reaching out to <strong>Tydra Cleaning</strong>! '
+            f'We have received your message and our team has been notified.'
+            f'</p>'
+            + _section("What happens next", (
+                _row("Step 1", "Our team reviews your request")
+                + _row("Step 2", "We reach out within the hour to discuss details")
+                + _row("Step 3", "We schedule a free on-site assessment")
+            ))
+            + (_section("Your submission", ref_row) if ref_row else "")
+            + f'<p style="margin:0 0 8px;font-size:12px;color:#94a3b8;">'
+            f'This is an automated confirmation. Please do not reply to this email &mdash; '
+            f'contact us directly at tydra.gta.cleaning@gmail.com or (647)&nbsp;877-3741.</p>'
+        )
+
+        plain = (
+            f"{greeting}\n\nThanks for reaching out to Tydra Cleaning! "
+            f"We have received your message and our team has been notified.\n"
+            f"We'll be in touch within the hour.\n"
+            + (f"\nReference #: {referral}\n" if referral else "")
+            + "\n— The Tydra Cleaning Team\n(647) 877-3741 | tydra.gta.cleaning@gmail.com\n"
+            f"\nNote: This is an automated confirmation. Do not reply to this email."
+        )
+
+        html = _email_html("Confirmation – We got your message", content)
+        msg.attach(MIMEText(plain, "plain"))
+        msg.attach(MIMEText(html, "html"))
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as server:
+            server.login(SMTP_USER, SMTP_PASS)
+            server.sendmail(SMTP_USER, to_email, msg.as_string())
+        logger.info("Client confirmation email sent to: %s", to_email)
+    except Exception as exc:
+        logger.error("Failed to send client confirmation email: %s", exc)
+
 
 
 @app.route("/", methods=["GET"])
@@ -1014,24 +1146,54 @@ def save_data():
 
     conn.close()
 
-    # Notify owner by email
+    # Notify owner by email — quote submission
     add_ons = ", ".join(details.get("serviceAddOns") or []) or "None"
     special = ", ".join(details.get("specialRequests") or []) or "None"
-    email_body = (
-        f"New Quote Request Received\n"
-        f"{'='*40}\n"
-        f"Referral Code : {referral}\n"
-        f"Submitted At  : {details.get('submittedAt', 'N/A')}\n"
-        f"Industry      : {details.get('selectedIndustry', 'N/A')}\n"
-        f"Square Feet   : {details.get('sqft', 'N/A')}\n"
-        f"Pricing Model : {details.get('pricingModel', 'N/A')}\n"
-        f"Frequency     : {details.get('freqCount', 'N/A')} time(s), {details.get('freqTimesPerDay', 'N/A')}x per day\n"
-        f"Service Add-ons: {add_ons}\n"
-        f"Quality Expectations: {details.get('qualityExpectations', 'N/A')}\n"
-        f"Special Requests: {special}\n"
-        f"\nView full details in your admin dashboard.\n"
+    freq_label = f"{details.get('freqCount', 'N/A')} time(s)"
+    if details.get("freqTimesPerDay"):
+        freq_label += f", {details['freqTimesPerDay']}× per day"
+
+    plain_body = (
+        f"New Quote Request\n{'='*38}\n"
+        f"Referral     : {referral}\n"
+        f"Industry     : {details.get('selectedIndustry', 'N/A')}\n"
+        f"Square Feet  : {details.get('sqft', 'N/A')}\n"
+        f"Pricing Model: {details.get('pricingModel', 'N/A')}\n"
+        f"Frequency    : {freq_label}\n"
+        f"Add-ons      : {add_ons}\n"
+        f"Special Req  : {special}\n"
+        f"Quality      : {details.get('qualityExpectations', 'N/A')}\n"
     )
-    send_notification_email(f"[Tydra] New Quote Request – {referral}", email_body)
+    html_content = (
+        f'<p style="margin:0 0 20px;font-size:15px;color:#0f172a;">'
+        f'A new quote request has been submitted. Review the details below.</p>'
+        + _section("Quote Overview", (
+            _row("Referral Code", f'<strong style="color:#0d9488;">{referral}</strong>')
+            + _row("Submitted At", details.get("submittedAt", "N/A"))
+        ))
+        + _section("Space Details", (
+            _row("Industry", details.get("selectedIndustry", "N/A"))
+            + _row("Square Footage", f"{details.get('sqft', 'N/A')} sq ft")
+        ))
+        + _section("Service Needs", (
+            _row("Cleaning Frequency", freq_label)
+            + _row("Pricing Model", details.get("pricingModel", "N/A"))
+            + _row("Service Add-ons", add_ons)
+            + _row("Special Requests", special)
+            + _row("Quality Expectations", details.get("qualityExpectations", "N/A"))
+        ))
+    )
+    html_body = _email_html(
+        "New Quote Request Received",
+        html_content,
+        cta_label="View in Dashboard",
+        cta_href="https://tydracleaning.com/dashboard"
+    )
+    send_notification_email(
+        f"[Tydra] New Quote Request \u2013 {referral}",
+        plain_body,
+        html_body
+    )
 
     return jsonify({"status": "success", "referralCode": referral})
 
@@ -1091,23 +1253,84 @@ def save_contact():
     conn.commit()
     conn.close()
 
-    # Notify owner by email
+    # Notify owner by email — contact submission
     name = clean_text(data.get("name"), max_len=120) or "N/A"
     business = clean_text(data.get("business_name"), max_len=180) or "N/A"
     client_email = clean_text(data.get("email"), max_len=180) or "N/A"
     phone = clean_text(data.get("phone"), max_len=40) or "N/A"
     message = clean_text(data.get("message"), max_len=2000, allow_newlines=True) or "N/A"
-    email_body = (
-        f"New Contact Us Submission\n"
-        f"{'='*40}\n"
-        f"Referral Code : {referral}\n"
-        f"Name          : {name}\n"
-        f"Business Name : {business}\n"
-        f"Email         : {client_email}\n"
-        f"Phone         : {phone}\n"
+
+    plain_body = (
+        f"New Contact Us Submission\n{'='*38}\n"
+        f"Referral : {referral}\n"
+        f"Name     : {name}\n"
+        f"Business : {business}\n"
+        f"Email    : {client_email}\n"
+        f"Phone    : {phone}\n"
         f"Message:\n{message}\n"
     )
-    send_notification_email(f"[Tydra] New Contact – {name}", email_body)
+    msg_html = message.replace("\n", "<br>")
+    html_content = (
+        f'<p style="margin:0 0 20px;font-size:15px;color:#0f172a;">'
+        f'A new contact form submission has been received.</p>'
+        + _section("Contact Details", (
+            _row("Referral Code", f'<strong style="color:#0d9488;">{referral}</strong>')
+            + _row("Name", name)
+            + _row("Business", business)
+            + _row("Email", f'<a href="mailto:{client_email}" style="color:#0d9488;">{client_email}</a>')
+            + _row("Phone", phone)
+        ))
+        + _section("Message", (
+            f'<tr><td colspan="2" style="padding:12px 14px;font-size:13px;color:#0f172a;'
+            f'line-height:1.7;">{msg_html}</td></tr>'
+        ))
+    )
+    html_body = _email_html(
+        f"New Contact from {name}",
+        html_content,
+        cta_label=f"Reply to {name}",
+        cta_href=f"mailto:{client_email}"
+    )
+    send_notification_email(
+        f"[Tydra] New Contact \u2013 {name}",
+        plain_body,
+        html_body
+    )
+
+    # Send confirmation to the client
+    if client_email and client_email != "N/A":
+        send_client_confirmation_email(client_email, name, referral)
+
+    return jsonify({"success": True})
+
+
+@app.route("/survey_rating", methods=["POST"])
+def survey_rating():
+    data, parse_error = parse_json_body()
+    if parse_error:
+        return parse_error
+
+    rating = data.get("rating")
+    if not isinstance(rating, int) or rating < 1 or rating > 5:
+        return jsonify({"error": "Rating must be an integer between 1 and 5"}), 400
+
+    referral = (data.get("referral") or "").strip().upper()[:64]
+
+    conn = db()
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS survey_ratings ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "rating INTEGER NOT NULL, "
+        "referral TEXT, "
+        "created_at TEXT NOT NULL"
+        ")"
+    )
+    conn.execute(
+        "INSERT INTO survey_ratings (rating, referral, created_at) VALUES (?, ?, ?)",
+        (rating, referral or None, datetime.now(timezone.utc).isoformat()),
+    )
+    conn.commit()
+    conn.close()
 
     return jsonify({"success": True})
 
