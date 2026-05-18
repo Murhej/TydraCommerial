@@ -630,35 +630,36 @@ export default function QuoteForm({ innerRef }) {
 
     try {
       await apiPost("/data", payload);
-      // Build contact note with full quote summary pre-filled
+      // Build structured quote summary for contact form pre-fill
       const sharedSummary = (footTrafficAnswers["Shared Spaces - (choose that apply)"] || [])
         .filter(item => item !== NO_SHARED_SPACES).join(", ") || "None";
       const srSummary = specialRequests.filter(x => x !== NO_SPECIAL_REQUEST).join(", ") || "None";
       const aoSummary = serviceAddOns.length === 0 || serviceAddOns.includes("No add-on")
         ? "None" : serviceAddOns.join(", ");
       const freqUnit = cleaningAnswers["Frequency"] === "Daily" ? "day" : "week";
-      const freqSummary = `${cleaningAnswers["Frequency"] || "-"}${freqCount ? ` | Times per ${freqUnit}: ${freqCount}` : ""}`;
-      const contactNote = [
-        "=== Quote Summary ===",
-        "",
-        "Space Details: SqFt: " + (sqft || "-") + " | Industry: " + (selectedIndustry || "-"),
-        "Usage & Foot Traffic: Traffic: " + (footTrafficAnswers["Foot traffic"] || "-") + " | Hours: " + (footTrafficAnswers["Operating Hours"] || "-") + " | Shared: " + sharedSummary,
-        "Cleaning Frequency: " + freqSummary,
-        "Special Requests: " + srSummary,
-        "Conditions & Challenges: Condition: " + (conditionAnswers["Current Condition"] || "-") + " | Problem: " + (conditionAnswers["Current Problem"] || "-"),
-        "Preferred Pricing Model: " + (pricingModel || "-"),
-        "Service Add-ons: " + aoSummary,
-        "Quality Expectations: " + (qualityExpectations || "-"),
-        "",
-        "--- Add your comments below ---",
-        ""
-      ].join("\n");
+      const quoteSummary = {
+        sqft: sqft || "-",
+        industry: selectedIndustry || "-",
+        traffic: footTrafficAnswers["Foot traffic"] || "-",
+        hours: footTrafficAnswers["Operating Hours"] || "-",
+        shared: sharedSummary,
+        frequency: cleaningAnswers["Frequency"] || "-",
+        freqDetail: freqCount ? `${freqCount}× per ${freqUnit}` : null,
+        specialRequests: srSummary,
+        condition: conditionAnswers["Current Condition"] || "-",
+        problem: conditionAnswers["Current Problem"] || "-",
+        pricingModel: pricingModel || "-",
+        addOns: aoSummary,
+        qualityExpectations: qualityExpectations || "-",
+        referral: payload.referralCode,
+      };
       try {
         const nowLabel = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
         window.localStorage.setItem(CONTACT_DRAFT_KEY, JSON.stringify({
           name: "", business_name: "", email: "", phone: "",
           referral_code: payload.referralCode,
-          message: contactNote,
+          quoteSummary,
+          message: "",
           draftSavedAt: nowLabel
         }));
       } catch { /* ignore quota issues */ }

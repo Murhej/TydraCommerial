@@ -34,6 +34,7 @@ export default function ContactInfo() {
   const [isSending, setIsSending] = useState(false);
   const [isDraftHydrated, setIsDraftHydrated] = useState(false);
   const [draftSavedAt, setDraftSavedAt] = useState("");
+  const [quoteSummary, setQuoteSummary] = useState(null);
 
   const formRef = useRef(null);
   const msgRef = useRef(null);
@@ -60,6 +61,7 @@ export default function ContactInfo() {
   const clearContactDraftOnly = () => {
     clearContactDraft();
     setDraftSavedAt("");
+    setQuoteSummary(null);
     setStatus({ type: "ok", text: "Saved contact draft was cleared." });
   };
 
@@ -88,6 +90,9 @@ export default function ContactInfo() {
         referral_code: draft.referral_code || "",
         message: draft.message || "",
       }));
+      if (draft.quoteSummary && typeof draft.quoteSummary === "object") {
+        setQuoteSummary(draft.quoteSummary);
+      }
       setDraftSavedAt(draft.draftSavedAt || "");
     } catch {
       // ignore malformed drafts
@@ -106,6 +111,7 @@ export default function ContactInfo() {
       phone: formData.phone,
       referral_code: formData.referral_code,
       message: formData.message,
+      quoteSummary: quoteSummary || undefined,
       draftSavedAt: nowLabel,
     };
     try {
@@ -122,23 +128,43 @@ export default function ContactInfo() {
     formData.phone,
     formData.referral_code,
     formData.message,
+    quoteSummary,
   ]);
+
+  const buildSummaryText = (qs) => {
+    const lines = ["QUOTE DETAILS", "─────────────────────────────────"];
+    if (qs.industry || qs.sqft) lines.push(`Space         : ${qs.industry || "-"} · ${qs.sqft || "-"} sq ft`);
+    if (qs.traffic || qs.hours) lines.push(`Foot Traffic  : ${qs.traffic || "-"} · ${qs.hours || "-"}`);
+    if (qs.shared && qs.shared !== "None") lines.push(`Shared Areas  : ${qs.shared}`);
+    if (qs.frequency) {
+      let freq = qs.frequency;
+      if (qs.freqDetail) freq += ` · ${qs.freqDetail}`;
+      lines.push(`Frequency     : ${freq}`);
+    }
+    if (qs.pricingModel) lines.push(`Pricing Model : ${qs.pricingModel}`);
+    if (qs.addOns && qs.addOns !== "None") lines.push(`Add-ons       : ${qs.addOns}`);
+    if (qs.specialRequests && qs.specialRequests !== "None") lines.push(`Special Req   : ${qs.specialRequests}`);
+    if (qs.condition || qs.problem) lines.push(`Condition     : ${qs.condition || "-"} · Problem: ${qs.problem || "-"}`);
+    if (qs.qualityExpectations) lines.push(`Quality Exp   : ${qs.qualityExpectations}`);
+    if (qs.referral) lines.push(`Referral #    : ${qs.referral}`);
+    lines.push("─────────────────────────────────");
+    return lines.join("\n");
+  };
 
   const validate = () => {
     const e = {};
     if (!formData.name.trim()) e.name = "Please enter your name.";
     if (!/^\S+@\S+\.\S+$/.test(formData.email)) e.email = "Enter a valid email.";
-    if (!formData.message.trim()) e.message = "Tell us a bit about the job.";
+    if (!quoteSummary && !formData.message.trim()) e.message = "Tell us a bit about the job.";
     if (formData.phone && !/^[0-9+\s()-]{7,}$/.test(formData.phone)) {
       e.phone = "Use numbers and ()-+ only.";
     }
-
     return e;
   };
   const isFormReady =
     !!formData.name.trim() &&
     /^\S+@\S+\.\S+$/.test(formData.email) &&
-    !!formData.message.trim() &&
+    (!!quoteSummary || !!formData.message.trim()) &&
     (!formData.phone || /^[0-9+\s()-]{7,}$/.test(formData.phone));
 
   const sendEmail = async (e) => {
@@ -160,6 +186,16 @@ export default function ContactInfo() {
     const submittedEmail = formData.email;
     const submittedReferral = formData.referral_code;
 
+    // Build combined message: structured summary + user's personal notes
+    const summaryText = quoteSummary ? buildSummaryText(quoteSummary) : "";
+    const userNotes = formData.message.trim();
+    const combinedMessage = summaryText && userNotes
+      ? summaryText + "\n\nAdditional Comments:\n" + userNotes
+      : summaryText || userNotes;
+
+    // Update textarea DOM value so emailjs picks up the combined message
+    if (msgRef.current) msgRef.current.value = combinedMessage;
+
     // Fire-and-forget: save to DB (non-blocking — user proceeds even if this fails)
     apiPost("/save_contact", {
       referral: submittedReferral,
@@ -167,7 +203,7 @@ export default function ContactInfo() {
       business_name: formData.business_name,
       email: submittedEmail,
       phone: formData.phone,
-      message: formData.message
+      message: combinedMessage
     }).catch(() => { /* non-critical — DB save best-effort */ });
 
     // Send via emailjs (best-effort — don't block redirect on failure)
@@ -344,19 +380,49 @@ export default function ContactInfo() {
                 : <span id="ref-hint" className="field__hint">If you started a Quote, paste the referral number here for faster lookup.</span>}
             </div>
 
+            {quoteSummary && (
+              <div className="quote-summary-card">
+                <div className="qsc-header">
+                  <span className="qsc-title">📋 Quote Summary</span>
+                  <button type="button" className="qsc-dismiss" onClick={() => setQuoteSummary(null)} aria-label="Remove quote summary">✕</button>
+                </div>
+                <dl className="qsc-grid">
+                  {quoteSummary.industry && <><dt>Industry</dt><dd>{quoteSummary.industry}</dd></>}
+                  {quoteSummary.sqft && <><dt>Square Footage</dt><dd>{quoteSummary.sqft} sq ft</dd></>}
+                  {quoteSummary.traffic && <><dt>Foot Traffic</dt><dd>{quoteSummary.traffic}</dd></>}
+                  {quoteSummary.hours && <><dt>Operating Hours</dt><dd>{quoteSummary.hours}</dd></>}
+                  {quoteSummary.shared && quoteSummary.shared !== "None" && <><dt>Shared Areas</dt><dd>{quoteSummary.shared}</dd></>}
+                  {quoteSummary.frequency && <><dt>Cleaning Frequency</dt><dd>{quoteSummary.frequency}{quoteSummary.freqDetail ? ` · ${quoteSummary.freqDetail}` : ""}</dd></>}
+                  {quoteSummary.pricingModel && <><dt>Pricing Model</dt><dd>{quoteSummary.pricingModel}</dd></>}
+                  {quoteSummary.specialRequests && quoteSummary.specialRequests !== "None" && <><dt>Special Requests</dt><dd>{quoteSummary.specialRequests}</dd></>}
+                  {quoteSummary.condition && <><dt>Condition</dt><dd>{quoteSummary.condition}</dd></>}
+                  {quoteSummary.problem && <><dt>Problem</dt><dd>{quoteSummary.problem}</dd></>}
+                  {quoteSummary.addOns && quoteSummary.addOns !== "None" && <><dt>Add-ons</dt><dd>{quoteSummary.addOns}</dd></>}
+                  {quoteSummary.qualityExpectations && <><dt>Quality</dt><dd>{quoteSummary.qualityExpectations}</dd></>}
+                  {quoteSummary.referral && <><dt>Referral #</dt><dd className="qsc-ref">{quoteSummary.referral}</dd></>}
+                </dl>
+              </div>
+            )}
+
             <div className="field full">
-              <label htmlFor="message" className="req">Notes / Message</label>
+              <label htmlFor="message" className={quoteSummary ? undefined : "req"}>
+                {quoteSummary ? "Additional Comments (optional)" : "Notes / Message"}
+              </label>
               <textarea
-                id="message" name="message" rows={3} ref={msgRef} required
+                id="message" name="message" rows={3} ref={msgRef}
+                required={!quoteSummary}
                 value={formData.message} onChange={handleChange}
                 aria-invalid={!!errors.message}
                 aria-describedby={errors.message ? "message-err" : "message-hint"}
                 maxLength={1000}
+                placeholder={quoteSummary ? "Add any extra details, questions, or special notes…" : ""}
               />
               <div className="field__meta">
                 {errors.message
                   ? <span id="message-err" className="field__error">{errors.message}</span>
-                  : <span id="message-hint" className="field__hint">Include sq. ft., frequency, access details, and special requests.</span>}
+                  : <span id="message-hint" className="field__hint">
+                      {quoteSummary ? "Your quote details above will be included automatically." : "Include sq. ft., frequency, access details, and special requests."}
+                    </span>}
                 <span className="count">{formData.message.length}/1000</span>
               </div>
             </div>

@@ -417,3 +417,94 @@
     min-width: 0;
   }
 }
+
+/* ─── Quote Summary Card ────────────────────────────────────── */
+.quote-summary-card {
+  border: 1.5px solid rgba(13, 148, 136, 0.35);
+  border-radius: 12px;
+  background: #f0fdfa;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+
+.qsc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: rgba(13, 148, 136, 0.1);
+  border-bottom: 1px solid rgba(13, 148, 136, 0.2);
+}
+
+.qsc-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0f766e;
+  letter-spacing: 0.01em;
+}
+
+.qsc-dismiss {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: #64748b;
+  padding: 3px 8px;
+  border-radius: 6px;
+  line-height: 1;
+  transition: background 0.15s;
+}
+.qsc-dismiss:hover {
+  background: rgba(0, 0, 0, 0.07);
+  color: #334155;
+}
+
+.qsc-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0;
+  padding: 8px 0 6px;
+  margin: 0;
+}
+
+.qsc-grid dt {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+  padding: 4px 8px 4px 16px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  align-self: baseline;
+}
+
+.qsc-grid dd {
+  font-size: 0.82rem;
+  color: #0f172a;
+  padding: 4px 16px 4px 4px;
+  margin: 0;
+  align-self: baseline;
+  word-break: break-word;
+}
+
+.qsc-ref {
+  font-weight: 700;
+  color: #0f766e !important;
+  font-family: "Courier New", monospace;
+  letter-spacing: 0.06em;
+}
+
+@media (max-width: 480px) {
+  .qsc-grid {
+    grid-template-columns: 1fr;
+  }
+  .qsc-grid dt {
+    padding-bottom: 0;
+    color: #0f766e;
+  }
+  .qsc-grid dd {
+    padding-top: 1px;
+    padding-bottom: 6px;
+    padding-left: 16px;
+  }
+}
